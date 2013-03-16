@@ -63,9 +63,9 @@ typedef struct {
   int dx, dy;			/* XRsiz, YRsiz              */
   int w, h;			/* width and height of data  */
   int x0, y0;			/* offset of the component compare to the whole image  */
-  int prec;			/* precision                 */
-  int bpp;			/* deapth of image in bits   */
-  int sgnd;			/* signed                    */
+  int prec;			/* precision  精准度               */
+  int bpp;			/* deapth of image in bits  深度  */
+  int sgnd;			/* signed    信道           */
   int resno_decoded;		/* number of decoded resolution */
   int factor;			/* number of division by 2 of the out image  compare to the original size of image */
   int *data;			/* image-component data      */
@@ -147,7 +147,7 @@ typedef struct {
   int ppm_store;		/* Use in case of multiple marker PPM (number of info already store)       */
   int ppm_previous;		/* Use in case of multiple marker PPM (case on non-finished previous info) */
   int ppm_len;			/* ppmbug1 */
-  j2k_tcp_t *tcps;		/* tile coding parameters                                                  */
+  j2k_tcp_t *tcps;		/* tile coding parameters   ,tile 编码参数                                               */
   int *matrice;			/* Fixed layer                                                             */
 } j2k_cp_t;
 

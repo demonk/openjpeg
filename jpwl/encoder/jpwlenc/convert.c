@@ -72,7 +72,7 @@ int bmptoimage(char *filename, j2k_image_t * img, int subsampling_dx,
   FILE *IN;
   FILE *Compo0 = NULL, *Compo1 = NULL, *Compo2 = NULL;
   BITMAPFILEHEADER_t File_h;
-  BITMAPINFOHEADER_t Info_h;
+  BITMAPINFOHEADER_t Info_h;//记录BMP的尺寸等信息
   unsigned char *RGB;
   unsigned char *table_R, *table_G, *table_B;
   unsigned int j, w, h, PAD, type = 0;
@@ -92,30 +92,32 @@ int bmptoimage(char *filename, j2k_image_t * img, int subsampling_dx,
     return 0;
   }
 
-  File_h.bfType = getc(IN);
-  File_h.bfType = (getc(IN) << 8) + File_h.bfType;
+  //以下都为小端保存,低位在前
+  File_h.bfType = getc(IN);//读取第一个字节,BMP为B,0x42
+  File_h.bfType = (getc(IN) << 8) + File_h.bfType;//0x4d42
 
+  //验证是否BMP
   if (File_h.bfType != 19778) {
     printf("Error, not a BMP file!\n");
     return 0;
   } else {
-    /* FILE HEADER */
+    /* 读取BMP的头 */
     /* ------------- */
-    File_h.bfSize = getc(IN);
+    File_h.bfSize = getc(IN);//0x36
     File_h.bfSize = (getc(IN) << 8) + File_h.bfSize;
     File_h.bfSize = (getc(IN) << 16) + File_h.bfSize;
-    File_h.bfSize = (getc(IN) << 24) + File_h.bfSize;
+    File_h.bfSize = (getc(IN) << 24) + File_h.bfSize;//0x240036
 
     File_h.bfReserved1 = getc(IN);
-    File_h.bfReserved1 = (getc(IN) << 8) + File_h.bfReserved1;
+    File_h.bfReserved1 = (getc(IN) << 8) + File_h.bfReserved1;//0x0000
 
     File_h.bfReserved2 = getc(IN);
-    File_h.bfReserved2 = (getc(IN) << 8) + File_h.bfReserved2;
+    File_h.bfReserved2 = (getc(IN) << 8) + File_h.bfReserved2;//0x0000
 
     File_h.bfOffBits = getc(IN);
     File_h.bfOffBits = (getc(IN) << 8) + File_h.bfOffBits;
     File_h.bfOffBits = (getc(IN) << 16) + File_h.bfOffBits;
-    File_h.bfOffBits = (getc(IN) << 24) + File_h.bfOffBits;
+    File_h.bfOffBits = (getc(IN) << 24) + File_h.bfOffBits;//0x36
 
     /* INFO HEADER */
     /* ------------- */
@@ -140,6 +142,7 @@ int bmptoimage(char *filename, j2k_image_t * img, int subsampling_dx,
     Info_h.biPlanes = getc(IN);
     Info_h.biPlanes = (getc(IN) << 8) + Info_h.biPlanes;
 
+	//每个像素所需的位数
     Info_h.biBitCount = getc(IN);
     Info_h.biBitCount = (getc(IN) << 8) + Info_h.biBitCount;
 
@@ -174,29 +177,26 @@ int bmptoimage(char *filename, j2k_image_t * img, int subsampling_dx,
     Info_h.biClrImportant = (getc(IN) << 24) + Info_h.biClrImportant;
 
     /* Read the data and store them in the OUT file */
-
-    if (Info_h.biBitCount == 24) {
+    if (Info_h.biBitCount == 24) {//24位图
       img->x0 = Dim[0];
       img->y0 = Dim[1];
-      img->x1 =
-	!Dim[0] ? (w - 1) * subsampling_dx + 1 : Dim[0] + (w -
-							   1) *
-	subsampling_dx + 1;
-      img->y1 =
-	!Dim[1] ? (h - 1) * subsampling_dy + 1 : Dim[1] + (h -
-							   1) *
-	subsampling_dy + 1;
-      img->numcomps = 3;
+      img->x1 =!Dim[0] ? (w - 1) * subsampling_dx + 1 : Dim[0] + (w -1) *subsampling_dx + 1;
+      img->y1 =!Dim[1] ? (h - 1) * subsampling_dy + 1 : Dim[1] + (h - 1) *subsampling_dy + 1;
+
+      img->numcomps = 3;//分量为3
       img->color_space = 1;
-      img->comps =
-	(j2k_comp_t *) malloc(img->numcomps * sizeof(j2k_comp_t));
+      img->comps =(j2k_comp_t *) malloc(img->numcomps * sizeof(j2k_comp_t));//分量的内存地址 
+
       for (i = 0; i < img->numcomps; i++) {
-	img->comps[i].prec = 8;
-	img->comps[i].bpp = 8;
+		  //初始化分量
+	img->comps[i].prec = 8;//精准度
+	img->comps[i].bpp = 8;//深度
 	img->comps[i].sgnd = 0;
 	img->comps[i].dx = subsampling_dx;
 	img->comps[i].dy = subsampling_dy;
       }
+
+	  //创建三个分量文件
       Compo0 = fopen("Compo0", "wb");
       if (!Compo0) {
 	fprintf(stderr,
@@ -215,27 +215,27 @@ int bmptoimage(char *filename, j2k_image_t * img, int subsampling_dx,
 
       /* Place the cursor at the beginning of the image information */
       fseek(IN, 0, SEEK_SET);
-      fseek(IN, File_h.bfOffBits, SEEK_SET);
+      fseek(IN, File_h.bfOffBits, SEEK_SET);//跳到位置数据的起始位置 
 
+	  //位图大小 
       W = Info_h.biWidth;
       H = Info_h.biHeight;
 
       // PAD = 4 - (3 * W) % 4;
       // PAD = (PAD == 4) ? 0 : PAD;
-      PAD = (3 * W) % 4 ? 4 - (3 * W) % 4 : 0;
 
+	  //当是24位图的时候,一个像素占用3位
+      PAD = (3 * W) % 4 ? 4 - (3 * W) % 4 : 0;//0~3,一行位数必须是4的倍数,不够就补0,计算出一行还有几个才够4的倍数
+      RGB =(unsigned char *) malloc((3 * W + PAD) * H * sizeof(unsigned char));
 
-      RGB =
-	(unsigned char *) malloc((3 * W + PAD) * H *
-				 sizeof(unsigned char));
-
-      fread(RGB, sizeof(unsigned char), (3 * W + PAD) * H, IN);
+      fread(RGB, sizeof(unsigned char), (3 * W + PAD) * H, IN);//从BMP的数据起始位置开始读入sizeof(unsigned char)*(3*W+PAD)个数据到RGB
 
       for (j = 0; j < (3 * W + PAD) * H; j++) {
+		  //分散流到三个文件当中
 	unsigned char elmt;
-	int Wp = 3 * W + PAD;
+	int Wp = 3 * W + PAD;//一行的字节数
 
-	elmt = RGB[(H - (j / Wp + 1)) * Wp + j % Wp];
+	elmt = RGB[(H - (j / Wp + 1)) * Wp + j % Wp];//j/Wp是所在行数,最后得出来的就是当前j所在的位置,倒序
 	if ((j % Wp) < (3 * W)) {
 	  switch (type) {
 	  case 0:
@@ -261,14 +261,8 @@ int bmptoimage(char *filename, j2k_image_t * img, int subsampling_dx,
     } else if (Info_h.biBitCount == 8 && Info_h.biCompression == 0) {
       img->x0 = Dim[0];
       img->y0 = Dim[1];
-      img->x1 =
-	!Dim[0] ? (w - 1) * subsampling_dx + 1 : Dim[0] + (w -
-							   1) *
-	subsampling_dx + 1;
-      img->y1 =
-	!Dim[1] ? (h - 1) * subsampling_dy + 1 : Dim[1] + (h -
-							   1) *
-	subsampling_dy + 1;
+      img->x1 =!Dim[0] ? (w - 1) * subsampling_dx + 1 : Dim[0] + (w -subsampling_dx )+ 1;
+	  img->y1 =!Dim[1] ? (h - 1) * subsampling_dy + 1 : Dim[1] + (h - 1) *subsampling_dy + 1;
 
       table_R = (unsigned char *) malloc(256 * sizeof(unsigned char));
       table_G = (unsigned char *) malloc(256 * sizeof(unsigned char));
@@ -296,6 +290,7 @@ int bmptoimage(char *filename, j2k_image_t * img, int subsampling_dx,
       RGB = (unsigned char *) malloc(W * H * sizeof(unsigned char));
 
       fread(RGB, sizeof(unsigned char), W * H, IN);
+
       if (gray_scale) {
 	img->numcomps = 1;
 	img->comps =

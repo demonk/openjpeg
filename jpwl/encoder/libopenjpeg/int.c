@@ -70,7 +70,7 @@ int int_abs(int a)
 
 /*
  * Divide an integer and round upwards.
- *
+ * 
  * a divided by b
  */
 int int_ceildiv(int a, int b)

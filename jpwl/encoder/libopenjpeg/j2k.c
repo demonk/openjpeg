@@ -1461,7 +1461,7 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
   set_epb=cio_tell();
 
   // scrivo i marker jpwl direttamente solo se uso gli intermed files
-  if (jpwl_cp.JPWL_on && cp->intermed_file)				// se è attiva l'opzione jpwl allora scrive l'epc
+  if (jpwl_cp.JPWL_on && cp->intermed_file)				// se ?attiva l'opzione jpwl allora scrive l'epc
 	  jpwl_write_EPC();
   
   j2k_write_cod();

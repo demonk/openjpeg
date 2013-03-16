@@ -26,7 +26,7 @@
  */
 
 
-/* questa è un' estensione della libreria dell'openjpeg in grado di implementare
+/* questa ?un' estensione della libreria dell'openjpeg in grado di implementare
  * la parte 11 dello standard JPEG2000 ossia il JPWL
  */
 
@@ -35,7 +35,7 @@
 
 
 typedef struct {
-	unsigned int JPWL_on;		//indica se usare le funzionalità JPWL e quindi l'EPC nel main header
+	unsigned int JPWL_on;		//indica se usare le funzionalit?JPWL e quindi l'EPC nel main header
 	unsigned int EPB_on;
 	unsigned int ESD_on;
 	unsigned int RED_on;
@@ -79,7 +79,7 @@ void correggi_esd(int offset, int len_esd, int Pesd);
 
 int jpwl_encode(char *input, char * output, unsigned long CL);
 
-/* qui andrò ad inserire le funzioni necessarie per il crc oppure la codifica RS
+/* qui andr?ad inserire le funzioni necessarie per il crc oppure la codifica RS
  * e le funzioni per le tecniche informative aggiuntive
  */
 

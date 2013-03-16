@@ -318,13 +318,14 @@ int main(int argc, char **argv)
 	cp_init.tcps = (j2k_tcp_t *) malloc(sizeof(j2k_tcp_t));	/* initialisation if only one tile */
 	tcp_init = &cp_init.tcps[0];
 	tcp_init->numlayers = 0;
+
 	jpwl_cp_init(&jpwl_cp);
 
 	cp.intermed_file=0;
 	use_index=0;
 
 
-
+	// 解释命令参数
 	while (1) {
 		int c = getopt(argc, argv,
 			"i:o:r:q:f:t:n:c:b:x:p:s:d:h:P:S:E:M:R:T:C:I:W,F");//不断读取参数
@@ -505,7 +506,7 @@ int main(int argc, char **argv)
 					sep = 0;
 					sscanf(s, "[%d,%d]%c", &prcw_init[res_spec],
 						&prch_init[res_spec], &sep);
-					CSty |= 0x01;
+					CSty |= 0x01;//J2K_CCP_CSTY_PRT
 					res_spec++;
 					s = strpbrk(s, "]") + 2;
 				} while (sep == ',');
@@ -672,17 +673,13 @@ int main(int argc, char **argv)
 		}//switch end
 	}
 
+	//Tile 偏移
 	cp.tx0 = TX0;
 	cp.ty0 = TY0;
 
 	// inserici i parametri jpwl
-
 	if(jpwl_cp.JPWL_on)
 		get_jpwl_cp(& cp);
-
-
-
-
 
 	/* Error messages */
 	/* -------------- */
@@ -699,6 +696,7 @@ int main(int argc, char **argv)
 	} // mod fixed_quality
 
 	/* if no rate entered, lossless by default */
+	/*默认无损*/
 	if (tcp_init->numlayers == 0) {
 		tcp_init->rates[tcp_init->numlayers] = 1;
 		tcp_init->numlayers++;
@@ -706,6 +704,7 @@ int main(int argc, char **argv)
 	}
 
 	if (TX0 > Dim[0] || TY0 > Dim[1]) {
+		//如果tile偏移值少于原始图像的偏移值则报错
 		fprintf(stderr,
 			"Error: Tile offset dimension is unnappropriate --> TX0(%d)<=IMG_X0(%d) TYO(%d)<=IMG_Y0(%d) \n",
 			TX0, Dim[0], TY0, Dim[1]);
@@ -720,10 +719,13 @@ int main(int argc, char **argv)
 		}
 	}
 
+	/* 判断图像类型 */
 	switch (cp.image_type) {
 	case 0:
 		if (Tile_arg) {
+			//如果有设置Tile大小,如果没有话默认为整个图像大小  
 			if (!pgxtoimage
+				
 				(infile, &img, cp.tdy, subsampling_dx, subsampling_dy, Dim,
 				cp)) {
 					fprintf(stderr, "not a pgx file\n");
@@ -746,6 +748,7 @@ int main(int argc, char **argv)
 		break;
 
 	case 2:
+		/* (输入文件,图像对象,样本元素X,样本元素Y,图像偏移值) */
 		if (!bmptoimage(infile, &img, subsampling_dx, subsampling_dy, Dim)) {
 			fprintf(stderr, " not a bmp file\n");
 			return 1;
@@ -765,14 +768,16 @@ int main(int argc, char **argv)
 	} */
 
 	if (Tile_arg == 1) {
+		//如果原始图像有偏移
 		cp.tw = int_ceildiv(img.x1 - cp.tx0, cp.tdx);
 		cp.th = int_ceildiv(img.y1 - cp.ty0, cp.tdy);
 	} else {
-		cp.tdx = img.x1 - cp.tx0;
-		cp.tdy = img.y1 - cp.ty0;
+		cp.tdx = img.x1 - cp.tx0;//右下角X-Tile.x
+		cp.tdy = img.y1 - cp.ty0;//右下角Y-Tile.y
 	}
 
 	/* Initialization for PPM marker */
+	//PPM:包含格式,宽高,bit数与图像数据
 	cp.ppm = 0;
 	cp.ppm_data = NULL;
 	cp.ppm_previous = 0;
@@ -780,19 +785,19 @@ int main(int argc, char **argv)
 
 	/* Init the mutiple tiles */
 	/* ---------------------- */
-	cp.tcps = (j2k_tcp_t *) malloc(cp.tw * cp.th * sizeof(j2k_tcp_t));
+	cp.tcps = (j2k_tcp_t *) malloc(cp.tw * cp.th * sizeof(j2k_tcp_t));//分成cp.tw*cp*th个片???????
 
 	for (tileno = 0; tileno < cp.tw * cp.th; tileno++) {
 		tcp = &cp.tcps[tileno];
-		tcp->numlayers = tcp_init->numlayers;
+		tcp->numlayers = tcp_init->numlayers;//层数
 		for (j = 0; j < tcp->numlayers; j++) {
-			if (cp.fixed_quality)   // add fixed_quality
-				tcp->distoratio[j] = tcp_init->distoratio[j];
+			if (cp.fixed_quality)   // add fixed_quality,如果设置-q	
+				tcp->distoratio[j] = tcp_init->distoratio[j];//PSNR的值,可以由-q参数输入
 			else
 				tcp->rates[j] = tcp_init->rates[j];
 		}
-		tcp->csty = CSty;
-		tcp->prg = Prog_order;
+		tcp->csty = CSty;//设置marker,coding style
+		tcp->prg = Prog_order; //progression order (default LRCP) 
 		tcp->mct = img.numcomps == 3 ? 1 : 0;
 		tcp->ppt = 0;
 		tcp->ppt_data = NULL;
@@ -800,7 +805,7 @@ int main(int argc, char **argv)
 
 		numpocs_tile = 0;
 		tcp->POC = 0;
-		if (numpocs) {
+		if (numpocs) {//Number of progression order change (POC) default 0
 			/* intialisation of POC */
 			tcp->POC = 1;
 			for (i = 0; i < numpocs; i++) {
@@ -817,10 +822,12 @@ int main(int argc, char **argv)
 				}
 			}
 		}
+
 		tcp->numpocs = numpocs_tile;
 		tcp->tccps = (j2k_tccp_t *) malloc(img.numcomps * sizeof(j2k_tccp_t));
 
 		for (i = 0; i < img.numcomps; i++) {
+			//遍历component
 			tccp = &tcp->tccps[i];
 			tccp->csty = CSty & 0x01;	/* 0 => one precinct || 1 => custom precinct  */
 			tccp->numresolutions = NumResolution;
@@ -830,10 +837,11 @@ int main(int argc, char **argv)
 			tccp->qmfbid = ir ? 0 : 1;
 			tccp->qntsty = ir ? J2K_CCP_QNTSTY_SEQNT : J2K_CCP_QNTSTY_NOQNT;
 			tccp->numgbits = 2;
-			if (i == ROI_compno)
+			if (i == ROI_compno)//如果设置了感兴趣区域
 				tccp->roishift = ROI_shift;
 			else
 				tccp->roishift = 0;
+
 			if (CSty & J2K_CCP_CSTY_PRT) {
 				int p = 0;
 				for (j = tccp->numresolutions - 1; j >= 0; j--) {
@@ -1000,6 +1008,6 @@ int main(int argc, char **argv)
 		free(cp.tcps[tileno].tccps);
 	free(cp.tcps);
 
-	system("pause");
+//	system("pause");
 	return 0;
 }
