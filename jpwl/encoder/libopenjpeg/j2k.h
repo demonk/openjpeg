@@ -63,19 +63,19 @@ typedef struct {
   int dx, dy;			/* XRsiz, YRsiz              */
   int w, h;			/* width and height of data  */
   int x0, y0;			/* offset of the component compare to the whole image  */
-  int prec;			/* precision  精准度               */
-  int bpp;			/* deapth of image in bits  深度  */
-  int sgnd;			/* signed    信道           */
+  int prec;			/* precision                 */
+  int bpp;			/* deapth of image in bits   */
+  int sgnd;			/* signed                    */
   int resno_decoded;		/* number of decoded resolution */
   int factor;			/* number of division by 2 of the out image  compare to the original size of image */
   int *data;			/* image-component data      */
 } j2k_comp_t;
 
 typedef struct {
-  int x0, y0;			/* XOsiz, YOsiz              */
-  int x1, y1;			/* Xsiz, Ysiz                */
-  int numcomps;			/* number of components      */
-  int color_space;		/* sRGB, Greyscale or YUV */
+  int x0, y0;			/* XOsiz, YOsiz   切片格子原点           */
+  int x1, y1;			/* Xsiz, Ysiz  网格大小              */
+  int numcomps;			/* number of components ,分量总数,在RGB当中有三个分量,分别为R,G,B,在灰度中只有高度分量     */
+  int color_space;		/* sRGB, Greyscale or YUV,色域 */
   j2k_comp_t *comps;		/* image-components          */
 } j2k_image_t;
 
@@ -124,7 +124,7 @@ typedef struct {
   int ppt_len;			/* ppmbug1 */
   float distoratio[100];	/* add fixed_quality */
   j2k_tccp_t *tccps;		/* tile-component coding parameters                                  */
-} j2k_tcp_t;
+} j2k_tcp_t;/* tile coding parameters ,切片分量*/
 
 typedef struct {
   int JPEG2000_format;		/* 0: J2K   1:JP2 */
@@ -136,20 +136,24 @@ typedef struct {
   int reduce_on;		/* option reduce is used if reduce = 1 */
   int reduce_value;		/* if option reduce is used -> original dimension divided by 2^value */
   int index_on;			/* 0 = no index || 1 = index */
-  int tx0, ty0;			/* XTOsiz, YTOsiz                    */
-  int tdx, tdy;			/* XTsiz, YTsiz                      */
-  char *comment;		/* comment for coding                */
+  int tx0, ty0;			/* XTOsiz, YTOsiz    切片格子原点                */
+  int tdx, tdy;			/* XTsiz, YTsiz   一个切片格子的大小                    */
+  char *comment;		/* comment for coding  切片描述              */
   int tw, th;			/* number of tiles in width and heigth */
   int *tileno;			/* ID number of the tiles present in the codestream */
   int tileno_size;		/* size of the vector tileno */
   unsigned char *ppm_data;	/* packet header store there for futur use in t2_decode_packet             */
+
+
   int ppm;			/* If ppm == 1 --> there was a PPM marker for the present tile             */
   int ppm_store;		/* Use in case of multiple marker PPM (number of info already store)       */
   int ppm_previous;		/* Use in case of multiple marker PPM (case on non-finished previous info) */
   int ppm_len;			/* ppmbug1 */
-  j2k_tcp_t *tcps;		/* tile coding parameters   ,tile 编码参数                                               */
+
+
+  j2k_tcp_t *tcps;		/* tile coding parameters                                                  */
   int *matrice;			/* Fixed layer                                                             */
-} j2k_cp_t;
+} j2k_cp_t;//component,/* 分量 */
 
 typedef struct {
   int start_pos, end_pos;	/* start and end position            */

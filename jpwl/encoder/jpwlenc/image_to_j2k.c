@@ -202,7 +202,7 @@ double dwt_norms_97[4][10] = {
 	{2.022, 3.989, 8.355, 17.04, 34.27, 68.63, 137.3, 274.6, 549.0},
 	{2.022, 3.989, 8.355, 17.04, 34.27, 68.63, 137.3, 274.6, 549.0},
 	{2.080, 3.865, 8.307, 17.18, 34.71, 69.59, 139.3, 278.6, 557.2}
-};
+};//97小波
 
 int floorlog2(int a)
 {
@@ -251,9 +251,7 @@ void calc_explicit_stepsizes(j2k_tccp_t * tccp, int prec)
 
 int main(int argc, char **argv)
 {
-
-
-	int len;
+    int len;
 	int NumResolution, numD_min;	/*   NumResolution : number of resolution                     */
 	int Tile_arg;			/*   Tile_arg = 0 (not in argument) ou = 1 (in argument)      */
 	int CSty;			/*   CSty : coding style                                      */
@@ -263,7 +261,7 @@ int main(int argc, char **argv)
 	int prcw_init[J2K_MAXRLVLS];	/*   Initialisation Precinct width                            */
 	int prch_init[J2K_MAXRLVLS];	/*   Initialisation Precinct height                           */
 	//int prcw_init, prch_init;                     /*   Initialisation precincts' size                           */
-	int cblockw_init, cblockh_init;	/*   Initialisation codeblocks' size                          */
+	int cblockw_init, cblockh_init;	/*   Initialisation codeblocks' size,分割块大小                          */
 	int mode, value;		/*   Mode switch (cblk_style)                                 */
 	int subsampling_dx, subsampling_dy;	/* subsampling value for dx and dy                    */
 	int ROI_compno, ROI_shift;	/*   region of interrest                                      */
@@ -272,6 +270,7 @@ int main(int argc, char **argv)
 	j2k_image_t img;
 	j2k_cp_t cp, cp_init;		/*   cp_init is used to initialise in multiple tiles          */
 	j2k_tcp_t *tcp, *tcp_init;	/*   tcp_init is used to initialise in multiple tile          */
+
 	j2k_poc_t POC[32];		/*   POC : used in case of Progression order change           */
 	j2k_poc_t *tcp_poc;
 	j2k_tccp_t *tccp;
@@ -318,14 +317,13 @@ int main(int argc, char **argv)
 	cp_init.tcps = (j2k_tcp_t *) malloc(sizeof(j2k_tcp_t));	/* initialisation if only one tile */
 	tcp_init = &cp_init.tcps[0];
 	tcp_init->numlayers = 0;
-
 	jpwl_cp_init(&jpwl_cp);
 
 	cp.intermed_file=0;
 	use_index=0;
 
 
-	// 解释命令参数
+
 	while (1) {
 		int c = getopt(argc, argv,
 			"i:o:r:q:f:t:n:c:b:x:p:s:d:h:P:S:E:M:R:T:C:I:W,F");//不断读取参数
@@ -486,7 +484,7 @@ int main(int argc, char **argv)
 			break;
 			/* ----------------------------------------------------- */
 		case 't':			/* tiles */
-			//整个图像的大小 
+			//一个切片的大小,默认为整个图像的大小 
 			{	
 				sscanf(optarg, "%d,%d", &cp.tdx, &cp.tdy);
 				Tile_arg = 1;
@@ -506,7 +504,7 @@ int main(int argc, char **argv)
 					sep = 0;
 					sscanf(s, "[%d,%d]%c", &prcw_init[res_spec],
 						&prch_init[res_spec], &sep);
-					CSty |= 0x01;//J2K_CCP_CSTY_PRT
+					CSty |= 0x01;
 					res_spec++;
 					s = strpbrk(s, "]") + 2;
 				} while (sep == ',');
@@ -673,11 +671,11 @@ int main(int argc, char **argv)
 		}//switch end
 	}
 
-	//Tile 偏移
 	cp.tx0 = TX0;
 	cp.ty0 = TY0;
 
 	// inserici i parametri jpwl
+
 	if(jpwl_cp.JPWL_on)
 		get_jpwl_cp(& cp);
 
@@ -696,21 +694,24 @@ int main(int argc, char **argv)
 	} // mod fixed_quality
 
 	/* if no rate entered, lossless by default */
-	/*默认无损*/
 	if (tcp_init->numlayers == 0) {
-		tcp_init->rates[tcp_init->numlayers] = 1;
+		tcp_init->rates[tcp_init->numlayers] = 1;//lossless,对应-r 参数,对每一个质量层设定一个压缩率
 		tcp_init->numlayers++;
-		cp.disto_alloc = 1;
+		cp.disto_alloc = 1;// 标记已经分配压缩率/失真率
 	}
 
 	if (TX0 > Dim[0] || TY0 > Dim[1]) {
-		//如果tile偏移值少于原始图像的偏移值则报错
+		/*
+		TX0:XTOsiz,图像域X起点
+		Dim[0]:xosize,图像起点
+		*/
 		fprintf(stderr,
 			"Error: Tile offset dimension is unnappropriate --> TX0(%d)<=IMG_X0(%d) TYO(%d)<=IMG_Y0(%d) \n",
 			TX0, Dim[0], TY0, Dim[1]);
 		return 1;
 	}
 
+	//what the fuck poc is????
 	for (i = 0; i < numpocs; i++) {
 		if (POC[i].prg == -1) {
 			fprintf(stderr,
@@ -719,13 +720,11 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* 判断图像类型 */
+	//根据不同的输入文件后缀选择不同的方法提取图像数据
 	switch (cp.image_type) {
 	case 0:
 		if (Tile_arg) {
-			//如果有设置Tile大小,如果没有话默认为整个图像大小  
 			if (!pgxtoimage
-				
 				(infile, &img, cp.tdy, subsampling_dx, subsampling_dy, Dim,
 				cp)) {
 					fprintf(stderr, "not a pgx file\n");
@@ -748,13 +747,14 @@ int main(int argc, char **argv)
 		break;
 
 	case 2:
-		/* (输入文件,图像对象,样本元素X,样本元素Y,图像偏移值) */
 		if (!bmptoimage(infile, &img, subsampling_dx, subsampling_dy, Dim)) {
 			fprintf(stderr, " not a bmp file\n");
 			return 1;
 		}
 		break;
 	}
+	
+	
 	/* to respect profile - 0 */
 	/* ---------------------- */
 	numD_min = 0;
@@ -768,16 +768,15 @@ int main(int argc, char **argv)
 	} */
 
 	if (Tile_arg == 1) {
-		//如果原始图像有偏移
-		cp.tw = int_ceildiv(img.x1 - cp.tx0, cp.tdx);
-		cp.th = int_ceildiv(img.y1 - cp.ty0, cp.tdy);
+		cp.tw = int_ceildiv(img.x1 - cp.tx0, cp.tdx);//(图像的宽-切片原点X),结果是在宽上有多少个tile
+		cp.th = int_ceildiv(img.y1 - cp.ty0, cp.tdy);//(图像的高-切片原点Y),结果是在高上有多少个tile
 	} else {
-		cp.tdx = img.x1 - cp.tx0;//右下角X-Tile.x
-		cp.tdy = img.y1 - cp.ty0;//右下角Y-Tile.y
+		cp.tdx = img.x1 - cp.tx0;//如果没设置切片大小,则切片为整个图像域(非图像,>=图像大小 )的大小 
+		cp.tdy = img.y1 - cp.ty0;
 	}
 
 	/* Initialization for PPM marker */
-	//PPM:包含格式,宽高,bit数与图像数据
+	//???????????????????
 	cp.ppm = 0;
 	cp.ppm_data = NULL;
 	cp.ppm_previous = 0;
@@ -785,27 +784,35 @@ int main(int argc, char **argv)
 
 	/* Init the mutiple tiles */
 	/* ---------------------- */
-	cp.tcps = (j2k_tcp_t *) malloc(cp.tw * cp.th * sizeof(j2k_tcp_t));//分成cp.tw*cp*th个片???????
+	cp.tcps = (j2k_tcp_t *) malloc(cp.tw * cp.th * sizeof(j2k_tcp_t));// 实际上是申请了一个分量片的数组
 
+	//分量片总数:cp.tw*cp.th
 	for (tileno = 0; tileno < cp.tw * cp.th; tileno++) {
+		//对每个分量片进行处理
 		tcp = &cp.tcps[tileno];
-		tcp->numlayers = tcp_init->numlayers;//层数
+		tcp->numlayers = tcp_init->numlayers;
+
+		//what the fuck numlayers is !!????????
 		for (j = 0; j < tcp->numlayers; j++) {
-			if (cp.fixed_quality)   // add fixed_quality,如果设置-q	
-				tcp->distoratio[j] = tcp_init->distoratio[j];//PSNR的值,可以由-q参数输入
+			if (cp.fixed_quality)   // add fixed_quality
+				tcp->distoratio[j] = tcp_init->distoratio[j];
 			else
 				tcp->rates[j] = tcp_init->rates[j];
 		}
-		tcp->csty = CSty;//设置marker,coding style
-		tcp->prg = Prog_order; //progression order (default LRCP) 
-		tcp->mct = img.numcomps == 3 ? 1 : 0;
+
+		tcp->csty = CSty;//设置编码风格
+		tcp->prg = Prog_order;
+		tcp->mct = img.numcomps == 3 ? 1 : 0;//如果是RGB(分量为3),则开启此多分量传输
+
+		//WHAT THE FUCK PPT IS??????
 		tcp->ppt = 0;
 		tcp->ppt_data = NULL;
 		tcp->ppt_store = 0;
 
+		//what the fuck poc is???????
 		numpocs_tile = 0;
 		tcp->POC = 0;
-		if (numpocs) {//Number of progression order change (POC) default 0
+		if (numpocs) {
 			/* intialisation of POC */
 			tcp->POC = 1;
 			for (i = 0; i < numpocs; i++) {
@@ -822,27 +829,30 @@ int main(int argc, char **argv)
 				}
 			}
 		}
-
 		tcp->numpocs = numpocs_tile;
+		////////////////////////////////////////
+
+		//
 		tcp->tccps = (j2k_tccp_t *) malloc(img.numcomps * sizeof(j2k_tccp_t));
 
 		for (i = 0; i < img.numcomps; i++) {
-			//遍历component
+			//遍历分量
 			tccp = &tcp->tccps[i];
 			tccp->csty = CSty & 0x01;	/* 0 => one precinct || 1 => custom precinct  */
-			tccp->numresolutions = NumResolution;
+			tccp->numresolutions = NumResolution;//????what the fuck is resolution,分解???
 			tccp->cblkw = int_floorlog2(cblockw_init);
-			tccp->cblkh = int_floorlog2(cblockh_init);
-			tccp->cblksty = mode;
-			tccp->qmfbid = ir ? 0 : 1;
-			tccp->qntsty = ir ? J2K_CCP_QNTSTY_SEQNT : J2K_CCP_QNTSTY_NOQNT;
-			tccp->numgbits = 2;
-			if (i == ROI_compno)//如果设置了感兴趣区域
-				tccp->roishift = ROI_shift;
+			tccp->cblkh = int_floorlog2(cblockh_init);//计算分割块二进制位数,如64即为6,即2的6次方为64
+			tccp->cblksty = mode;//????what the hell mode is?????
+			tccp->qmfbid = ir ? 0 : 1;//设定是否可逆//???可逆个啥啊????可逆个小波啊!!小波可逆个啥啊???
+			tccp->qntsty = ir ? J2K_CCP_QNTSTY_SEQNT : J2K_CCP_QNTSTY_NOQNT;//量化模式
+			tccp->numgbits = 2;//????这又是个啥啊???
+			if (i == ROI_compno)
+				tccp->roishift = ROI_shift;//判断是否打开感 兴趣区域编码
 			else
 				tccp->roishift = 0;
 
-			if (CSty & J2K_CCP_CSTY_PRT) {
+			//??????????????????????????????
+			if (CSty & J2K_CCP_CSTY_PRT) {//这一天天的模式是神马意思啊!!!!
 				int p = 0;
 				for (j = tccp->numresolutions - 1; j >= 0; j--) {
 					if (p < res_spec) {
@@ -1008,6 +1018,6 @@ int main(int argc, char **argv)
 		free(cp.tcps[tileno].tccps);
 	free(cp.tcps);
 
-//	system("pause");
+	//system("pause");
 	return 0;
 }
