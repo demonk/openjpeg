@@ -78,6 +78,7 @@ int jp2_read_boxhdr(jp2_box_t * box)
 /*
 * 
 * Initialisation of a Standard JP2 structure
+* 创建一个标准的JP2结构
 */
 
 int jp2_init_stdjp2(jp2_struct_t * jp2_struct, j2k_image_t * img)

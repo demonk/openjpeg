@@ -271,10 +271,11 @@ int main(int argc, char **argv)
 	j2k_cp_t cp, cp_init;		/*   cp_init is used to initialise in multiple tiles          */
 	j2k_tcp_t *tcp, *tcp_init;	/*   tcp_init is used to initialise in multiple tile          */
 
+	//POC,码流标记,出现在主标头,拼接块标头,拼接块部分标头
 	j2k_poc_t POC[32];		/*   POC : used in case of Progression order change           */
 	j2k_poc_t *tcp_poc;
-	j2k_tccp_t *tccp;
 
+	j2k_tccp_t *tccp;
 	int i, tileno, j;
 	char *infile = 0;
 	char *outfile = 0;
@@ -677,7 +678,7 @@ int main(int argc, char **argv)
 	// inserici i parametri jpwl
 
 	if(jpwl_cp.JPWL_on)
-		get_jpwl_cp(& cp);
+		get_jpwl_cp(&cp);
 
 	/* Error messages */
 	/* -------------- */
@@ -692,6 +693,7 @@ int main(int argc, char **argv)
 			"Error: options -r -q and -f can not be used together !!\n");
 		return 1;
 	} // mod fixed_quality
+
 
 	/* if no rate entered, lossless by default */
 	if (tcp_init->numlayers == 0) {
@@ -712,6 +714,7 @@ int main(int argc, char **argv)
 	}
 
 	//what the fuck poc is????
+	//渐进顺序改变(POC标记段)
 	for (i = 0; i < numpocs; i++) {
 		if (POC[i].prg == -1) {
 			fprintf(stderr,
@@ -790,9 +793,10 @@ int main(int argc, char **argv)
 	for (tileno = 0; tileno < cp.tw * cp.th; tileno++) {
 		//对每个分量片进行处理
 		tcp = &cp.tcps[tileno];
-		tcp->numlayers = tcp_init->numlayers;
+		tcp->numlayers = tcp_init->numlayers;//取得质量层数
 
 		//what the fuck numlayers is !!????????
+		//对每个质量层进行质量赋值
 		for (j = 0; j < tcp->numlayers; j++) {
 			if (cp.fixed_quality)   // add fixed_quality
 				tcp->distoratio[j] = tcp_init->distoratio[j];
@@ -805,16 +809,18 @@ int main(int argc, char **argv)
 		tcp->mct = img.numcomps == 3 ? 1 : 0;//如果是RGB(分量为3),则开启此多分量传输
 
 		//WHAT THE FUCK PPT IS??????
+		//PPT=Packed Packet headers,Tile-part header,拼接头部分
 		tcp->ppt = 0;
 		tcp->ppt_data = NULL;
 		tcp->ppt_store = 0;
 
-		//what the fuck poc is???????=====>>Progression Order Change
+		//what the fuck poc is???????=====>>Progression Order Change,渐进顺序改变,是码流主标头的标记段
 		numpocs_tile = 0;
 		tcp->POC = 0;
 		if (numpocs) {
 			/* intialisation of POC */
 			tcp->POC = 1;
+			//初始化拼接头属性
 			for (i = 0; i < numpocs; i++) {
 				if (tileno == POC[i].tile - 1 || POC[i].tile == -1) {
 					tcp_poc = &tcp->pocs[numpocs_tile];

@@ -26,7 +26,7 @@
  */
 
 
-/* questa è un' estensione della libreria dell'openjpeg in grado di implementare
+/* questa ?un' estensione della libreria dell'openjpeg in grado di implementare
  * la parte 11 dello standard JPEG2000 ossia il JPWL
  */
 
@@ -171,7 +171,7 @@ static long CrcT32[256] = {0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
 
 
 /* inizializza i parametri relativi al JPWL *
- * disabilitando le funzionalità            */
+ * disabilitando le funzionalit?           */
 
 void jpwl_cp_init(JPWL_cp_t *jpwl_cp){
 	jpwl_cp->JPWL_on = 0;
@@ -188,7 +188,7 @@ void jpwl_cp_init(JPWL_cp_t *jpwl_cp){
  ****************************************************************************************/
 
 /* Scrive il marker segment EPC
-   version 0.1: in questa prima fase questo andrà subito dopo il SIZ */
+   version 0.1: in questa prima fase questo andr?subito dopo il SIZ */
 
 void jpwl_write_EPC(){
 	int lenp, len, i;
@@ -223,14 +223,14 @@ void jpwl_write_EPC(){
 
 	/* Al momento non esistono tecniche informative aggiuntive per richiamarle
 	 * opereremo in questo modo:
-	 * 0) dovrò inserire nella struttura jpwl_cp_t un campo contenente un puntatore
-	 *    ad un array che conterrà gli ID delle tecniche informative da usare;
+	 * 0) dovr?inserire nella struttura jpwl_cp_t un campo contenente un puntatore
+	 *    ad un array che conterr?gli ID delle tecniche informative da usare;
 	 * 1) conrollo il campo info_tech_on;
 	 * 2) eseguo delle funzioni da inserire nel file jpw.c e jpw.h relative alle 
 	 *    tecniche informative desiderate; tali funzioni dovranno preoccuparsi di
 	 *    creare i campi corretti nel marker segment.
 	 *  if( jpwl_cp->info_tech_on){
-	 *      qui inserirò i comandi desiderati
+	 *      qui inserir?i comandi desiderati
 	 *  }
 	 */
     len = cio_tell() - lenp;
@@ -289,14 +289,14 @@ void jpwl_write_EPC_fin(unsigned long CL, long *pepbs, int num_epb){
 
 	/* Al momento non esistono tecniche informative aggiuntive per richiamarle
 	 * opereremo in questo modo:
-	 * 0) dovrò inserire nella struttura jpwl_cp_t un campo contenente un puntatore
-	 *    ad un array che conterrà gli ID delle tecniche informative da usare;
+	 * 0) dovr?inserire nella struttura jpwl_cp_t un campo contenente un puntatore
+	 *    ad un array che conterr?gli ID delle tecniche informative da usare;
 	 * 1) conrollo il campo info_tech_on;
 	 * 2) eseguo delle funzioni da inserire nel file jpw.c e jpw.h relative alle 
 	 *    tecniche informative desiderate; tali funzioni dovranno preoccuparsi di
 	 *    creare i campi corretti nel marker segment.
 	 *  if( jpwl_cp->info_tech_on){
-	 *      qui inserirò i comandi desiderati
+	 *      qui inserir?i comandi desiderati
 	 *  }
 	 */
     len = cio_tell() - lenp;
@@ -397,21 +397,21 @@ void JPWL_write_EPB(char *buf, unsigned long LDPepb, unsigned long Pepb, unsigne
 	// devi implementare il codice rs per la protezione dell'epb
 	// cio_write(0, (int) ceil((lenp+11)*(n1 - k1)/k1));
 	if(!(alpha_to=(int *) calloc(256,sizeof(int))))
-	     printf("Non può essere allocata memoria per eseguire il programma1\n ");
+	     printf("Non pu?essere allocata memoria per eseguire il programma1\n ");
 
     if(!(index_of=(int *) calloc(256,sizeof(int))))
-  	     printf("Non può essere allocata memoria per eseguire il programma2\n ");
+  	     printf("Non pu?essere allocata memoria per eseguire il programma2\n ");
 	
 	if(!(gg=(int *) calloc((n1 - k1 +1),sizeof(int))))
-  	     printf("Non può essere allocata memoria per eseguire il programma3\n ");
+  	     printf("Non pu?essere allocata memoria per eseguire il programma3\n ");
 	
 	k = 255-(n1-k1);
 
 	if(!(data_=(int *) calloc(k, sizeof(int))))
-  	     printf("Non può essere allocata memoria per eseguire il programma4\n ");
+  	     printf("Non pu?essere allocata memoria per eseguire il programma4\n ");
 
 	if(!(bb=(int *) calloc((n1 - k1),sizeof(int))))
-  	     printf("Non può essere allocata memoria per eseguire il programma5\n ");
+  	     printf("Non pu?essere allocata memoria per eseguire il programma5\n ");
 	
 	generate_gf(alpha_to, index_of);
 
@@ -452,7 +452,7 @@ void JPWL_write_EPB(char *buf, unsigned long LDPepb, unsigned long Pepb, unsigne
 	
 	
 	if (!data_unprot) {
-		if (CRC == 1){			//crc ccitt 16 bit questo è l'algo
+		if (CRC == 1){			//crc ccitt 16 bit questo ?l'algo
 			ResetCRC();
 			for (i=0; i < LDPepb; i++){
 				UpdateCRC16(buf[i]);	
@@ -476,19 +476,19 @@ void JPWL_write_EPB(char *buf, unsigned long LDPepb, unsigned long Pepb, unsigne
 			k = 255-(n2-k2);
 
 			if(!(alpha_to=(int *) malloc(256*sizeof(int))))
-				printf("Non può essere allocata memoria per eseguire il programma1\n ");
+				printf("Non pu?essere allocata memoria per eseguire il programma1\n ");
 
 			if(!(index_of=(int *) malloc(256*sizeof(int))))
-  				printf("Non può essere allocata memoria per eseguire il programma2\n ");
+  				printf("Non pu?essere allocata memoria per eseguire il programma2\n ");
 	
 			if(!(gg=(int *) malloc((n2 - k2 +1)*sizeof(int))))
-  				printf("Non può essere allocata memoria per eseguire il programma3\n ");	
+  				printf("Non pu?essere allocata memoria per eseguire il programma3\n ");	
 				
 			if(!(data_=(int *) malloc(k*sizeof(int))))
-  				printf("Non può essere allocata memoria per eseguire il programma4\n ");
+  				printf("Non pu?essere allocata memoria per eseguire il programma4\n ");
 
 			if(!(bb=(int *) malloc((n2 - k2)*sizeof(int))))
-  				printf("Non può essere allocata memoria per eseguire il programma5\n ");
+  				printf("Non pu?essere allocata memoria per eseguire il programma5\n ");
 			
 			generate_gf(alpha_to, index_of);
 
@@ -500,7 +500,7 @@ void JPWL_write_EPB(char *buf, unsigned long LDPepb, unsigned long Pepb, unsigne
 
 				for (j=0; j<k2; j++){
 					if (j+(cont*k2) < LDPepb)
-						data_[j]= 0x000000ff & buf[j+(cont*k2)];  //qualcuno dovrà spiegarmi il perchè!!!!
+						data_[j]= 0x000000ff & buf[j+(cont*k2)];  //qualcuno dovr?spiegarmi il perch?!!!
 					else data_[j] = 0;		//padding
 				}
 				
@@ -560,7 +560,7 @@ void jpwl_write_ESD(char Pesd, int notil){
 	mode = ((Pesd & 0xC0)>>6);
 	M = 65025;
 	// creo le matrici che conterranno i valori di deltaMSE e deltaPSNR
-	// in realtà spreco un po' di memoria nel caso in cui la scrivo nei tile...
+	// in realt?spreco un po' di memoria nel caso in cui la scrivo nei tile...
 	dMSE = (double **) malloc(j2k_cp->th * j2k_cp->tw * sizeof(double));
 	for (i=0; i<j2k_cp->th * j2k_cp->tw; i++)
 		dMSE[i]=(double*) malloc(info_IM.num *sizeof(double));
@@ -577,7 +577,7 @@ void jpwl_write_ESD(char Pesd, int notil){
 	if (notil != 0) notil--; 
 	
 	// calcolo di dPSNR, dMSE e PSNR 
-	// nuova routine più snella!!
+	// nuova routine pi?snella!!
 	for (i = notil; i < ult; i++){
 		val = 0;
 		npix = info_IM.tile[i].nbpix;
@@ -597,11 +597,11 @@ void jpwl_write_ESD(char Pesd, int notil){
 		} 
 	}
 	
-	//ora scrivo i valori di sensibilità in base alla metrica scelta
+	//ora scrivo i valori di sensibilit?in base alla metrica scelta
 	switch (metric){
 			case 0:
-				//relative error sensitivity: i lvelli di sensibilità coincidono con i layer (livello 0 = header) 
-				//uso sette livelli di sensibilità relativa
+				//relative error sensitivity: i lvelli di sensibilit?coincidono con i layer (livello 0 = header) 
+				//uso sette livelli di sensibilit?relativa
 				switch (mode){
 					case 0:
 						//packet mode
@@ -1067,7 +1067,7 @@ int JPWL_len_EPB(unsigned int LDPepb, unsigned int Pepb, unsigned char Depb){
 void jpwl_write_RED(){
 	//questa funzione scrive un marker RED di test vuoto
 	cio_write(JPWL_MS_RED,2);
-	//già scrivo la len(non metto informazioni nel marker, poichè la codestream sarà corretta)
+	//gi?scrivo la len(non metto informazioni nel marker, poich?la codestream sar?corretta)
 	cio_write(3,2);
 	cio_write(jpwl_cp.pred,1);
 }
@@ -1083,9 +1083,9 @@ void JPWL_write_Pepbs(long *pepbs, int num_epb){
 	cio_skip(2);
 	lenp=cio_tell();
 	/*
-		Qui in base a come deciderò di far operare l'encoder dovrò trovare il modo di inserire
+		Qui in base a come decider?di far operare l'encoder dovr?trovare il modo di inserire
 		i Pepb relativi alla struttura; In questo caso uso una struttura fissa che prevede un 
-		solo epb nel main header che usa lo stesso codice relativo al primo epb e più epb per 
+		solo epb nel main header che usa lo stesso codice relativo al primo epb e pi?epb per 
 		ogni tile part header, il primo che protegge tutto il tph con lo stesso codice relativo 
 		al primo epb del tile part,  gli altri a protezione dei dati con un codice rs specificato
 	*/
@@ -1276,7 +1276,7 @@ int uep(int notil, char *bs, char *header, int len_header){
 			len[i]= (info_IM.tile[notil-1].packet[end[i]].end_pos) - info_IM.tile[notil-1].packet[start[i]].start_pos +1;
 			/*printf("len[%d]: %d\n",i, len[i]); */
 			if (i==0)
-				//poichè non viene considerato il marker SOD
+				//poich?non viene considerato il marker SOD
 				len[i]+=2;
 			lmax[i] = pianifica_epb(len[i], jpwl_cp.pepb[i+1], &no_epb[i]);
 			/*printf("lmax[%d]: %d\n", i, lmax[i]);*/
@@ -1381,11 +1381,11 @@ int uep_lay(int notil, char *bs, char *header, int len_header){
 	//preparo i vettori necessari
 
 	if(!(lmax=(int *) malloc(n_lay * sizeof(int))))
-	     printf("Non può essere allocata memoria per eseguire il programma3\n ");
+	     printf("Non pu?essere allocata memoria per eseguire il programma3\n ");
 	if(!(no_epb=(int *) malloc(n_lay * sizeof(int))))
-	     printf("Non può essere allocata memoria per eseguire il programma3\n ");
+	     printf("Non pu?essere allocata memoria per eseguire il programma3\n ");
 	if(!(len=(int *) malloc(n_lay * sizeof(int))))
-	     printf("Non può essere allocata memoria per eseguire il programma3\n ");
+	     printf("Non pu?essere allocata memoria per eseguire il programma3\n ");
 
 	//mi piazzo alla fine di SOT
 	set=cio_tell();
@@ -1401,7 +1401,7 @@ int uep_lay(int notil, char *bs, char *header, int len_header){
 		len[i] = (info_IM.tile[notil-1].packet[((i+1) * npack) - 1].end_pos) - info_IM.tile[notil-1].packet[i * npack].start_pos +1;
 		/*printf("len[%d]: %d\n",i, len[i]); */
 		if (i==0)
-			//poichè non viene considerato il marker SOD
+			//poich?non viene considerato il marker SOD
 			len[i]+=2;
 		lmax[i] = pianifica_epb(len[i], jpwl_cp.pepb[i+1], &no_epb[i]);
 		/*printf("lmax[%d]: %d\n", i, lmax[i]);*/
@@ -1517,7 +1517,7 @@ int jpwl_encode(char *input, char * output, unsigned long CL){
 		j2k_state = J2K_STATE_TPH;
 		for (notil=1; notil <= j2k_cp->tw * j2k_cp->th; notil++){
 			Psot_cor = 0;
-			//trucco per non fare sbagliare nella scrittura di più di 64 epb
+			//trucco per non fare sbagliare nella scrittura di pi?di 64 epb
 			scavalcato=0;
 			cio_skip(4);
 			len_til = cio_read(4);
@@ -1629,7 +1629,7 @@ int jpwl_encode(char *input, char * output, unsigned long CL){
 
 		//ora mi trovo alla fine della codestream
 		len_tot=cio_tell();
-		// controllo se devo inserire l'esd (non lo devo inserire qui se è attivo il packet range mode)
+		// controllo se devo inserire l'esd (non lo devo inserire qui se ?attivo il packet range mode)
 		if ((jpwl_cp.ESD_on)&(!(((jpwl_cp.pesd & 0xC0)>>6)==2))){
 			cio_seek(end_siz);
 			len_data1 = len_tot - end_siz;
@@ -1690,7 +1690,7 @@ int jpwl_encode(char *input, char * output, unsigned long CL){
 			cio_write(input[i],1);
 		}
 		cur_pos = cio_tell();
-		//se l'esd è presente ed è in byte range mode devo correggere la posizioni
+		//se l'esd ?presente ed ?in byte range mode devo correggere la posizioni
 		if (jpwl_cp.ESD_on && (((jpwl_cp.pesd & 0xC0)>>6)==1) ){
 			cio_seek(pos);
 			correggi_esd(corr, len_esd, jpwl_cp.pesd);
