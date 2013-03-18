@@ -446,7 +446,7 @@ int main(int argc, char **argv)
 			/* dda */
 			/* ----------------------------------------------------- */
 		case 'f':			/* mod fixed_quality (before : -q) */
-			//编码raw数据时要指明长，宽，通道数与通道位数
+			//编码raw数据时要指明长，宽，通道数与通道位数XXXXX
 			{	s = optarg;
 			sscanf(s, "%d", &tcp_init->numlayers);
 			s++;
@@ -809,7 +809,7 @@ int main(int argc, char **argv)
 		tcp->ppt_data = NULL;
 		tcp->ppt_store = 0;
 
-		//what the fuck poc is???????
+		//what the fuck poc is???????=====>>Progression Order Change
 		numpocs_tile = 0;
 		tcp->POC = 0;
 		if (numpocs) {
