@@ -970,6 +970,7 @@ int main(int argc, char **argv)
 		/* If you wish to modify those boxes, you have to modify the jp2_struct content*/ 
 		if (jp2_init_stdjp2(jp2_struct, &img))
 		{
+			//初始化jp2文件格式框架
 			fprintf(stderr,"Error with jp2 initialization");
 			return 1;
 		};
@@ -978,9 +979,13 @@ int main(int argc, char **argv)
 			/*For the moment, JP2 format does not use intermediary files for each tile*/
 			cp.intermed_file=0;
 		}
-		outbuf = (char *) malloc( cp.tdx * cp.tdy * cp.tw * cp.th * 10 *sizeof(char));
-		cio_init(outbuf, cp.tdx * cp.tdy * cp.tw * cp.th * 10);    
+		outbuf = (char *) malloc( cp.tdx * cp.tdy * cp.tw * cp.th * 10 *sizeof(char));//为图像域申请空间,那个10嘛......呃......
+		cio_init(outbuf, cp.tdx * cp.tdy * cp.tw * cp.th * 10); 
+
+		/////////////////////////////////////////////////////
 		len = jp2_encode(jp2_struct, &cp, outbuf, index);
+		////////////////////////////////////////////////////
+
 		if (len == 0) {
 			fprintf(stderr, "failed to encode image\n");
 			return 1;

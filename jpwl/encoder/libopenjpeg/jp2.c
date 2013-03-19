@@ -91,40 +91,40 @@ int jp2_init_stdjp2(jp2_struct_t * jp2_struct, j2k_image_t * img)
   jp2_struct->numcomps = img->numcomps;	// NC
   jp2_struct->comps = (jp2_comps_t *) malloc(jp2_struct->numcomps * sizeof(jp2_comps_t));
 
-  depth_0 = img->comps[0].prec - 1;
+  depth_0 = img->comps[0].prec - 1;//图像其中一个分量的分区数
   sign = img->comps[0].sgnd;
   jp2_struct->bpc = depth_0 + (sign << 7);
 
   for (i = 1; i < img->numcomps; i++) {
-    depth = img->comps[i].prec - 1;
+    depth = img->comps[i].prec - 1;//获取其他分量的分区数
     sign = img->comps[i].sgnd;
-    if (depth_0 != depth)
-      jp2_struct->bpc = 255;
+    if (depth_0 != depth)//如果其他位深与第一个分量的位深不等
+      jp2_struct->bpc = 255;// 设置每个图像分量位尝试为255
   }
-
-
 
   jp2_struct->C = 7;		// C : Always 7
   jp2_struct->UnkC = 0;		// UnkC, colorspace specified in colr box
-  jp2_struct->IPR = 0;		// IPR, no intellectual property
+  jp2_struct->IPR = 0;		// IPR, no intellectual property,知识产权
 
   for (i = 0; i < img->numcomps; i++)
     jp2_struct->comps[i].bpcc =
       img->comps[i].prec - 1 + (img->comps[i].sgnd << 7);
 
-  jp2_struct->precedence = 0;	// PRECEDENCE
+  jp2_struct->precedence = 0;	// PRECEDENCE,优先级 
   jp2_struct->approx = 0;	// APPROX
 
-  if ((img->numcomps == 1 || img->numcomps == 3)
-      && (jp2_struct->bpc != 255))
-    jp2_struct->meth = 1;
+  if ((img->numcomps == 1 || img->numcomps == 3)//灰度图或者 RGB图
+      && (jp2_struct->bpc != 255))//以及位深不等于255
+    jp2_struct->meth = 1;//ECS
   else
-    jp2_struct->meth = 2;
+    jp2_struct->meth = 2;//ICP
 
   if (jp2_struct->meth == 1) {
     if (img->color_space == 1)
+		//如果是通过ECS发送且色域为sRGB
       jp2_struct->enumcs = 16;
     else if (img->color_space == 2)
+		//单色空间
       jp2_struct->enumcs = 17;
     else if (img->color_space == 3)
       jp2_struct->enumcs = 18;	// YUV                          
@@ -133,7 +133,8 @@ int jp2_init_stdjp2(jp2_struct_t * jp2_struct, j2k_image_t * img)
 
   jp2_struct->brand = JP2_JP2;	/* BR         */
   jp2_struct->minversion = 0;	/* MinV       */
-  jp2_struct->numcl = 1;
+
+  jp2_struct->numcl = 1;//兼容列表
   jp2_struct->cl = (int *) malloc(jp2_struct->numcl * sizeof(int));
   jp2_struct->cl[0] = JP2_JP2;	/* CL0 : JP2  */
   return 0;
@@ -204,10 +205,10 @@ void jp2_write_ihdr(jp2_struct_t * jp2_struct)
 
   box.init_pos = cio_tell();
   cio_skip(4);
-  cio_write(JP2_IHDR, 4);	// IHDR
+  cio_write(JP2_IHDR, 4);	// IHDR,Image Header
 
-  cio_write(jp2_struct->h, 4);	// HEIGHT
-  cio_write(jp2_struct->w, 4);	// WIDTH
+  cio_write(jp2_struct->h, 4);	// HEIGHT,图像区域中的高度
+  cio_write(jp2_struct->w, 4);	// WIDTH,图像区域中的宽度
   cio_write(jp2_struct->numcomps, 2);	// NC
 
   cio_write(jp2_struct->bpc, 1);	// BPC  
@@ -222,7 +223,7 @@ void jp2_write_ihdr(jp2_struct_t * jp2_struct)
   cio_seek(box.init_pos + box.length);
 }
 
-
+/* 输出图像分量的位深度 */
 void jp2_write_bpcc(jp2_struct_t * jp2_struct)
 {
   unsigned int i;
@@ -233,7 +234,7 @@ void jp2_write_bpcc(jp2_struct_t * jp2_struct)
   cio_write(JP2_BPCC, 4);	// BPCC
 
   for (i = 0; i < jp2_struct->numcomps; i++)
-    cio_write(jp2_struct->comps[i].bpcc, 1);
+    cio_write(jp2_struct->comps[i].bpcc, 1);//输出每一个图像分量的位深度
 
   box.length = cio_tell() - box.init_pos;
   cio_seek(box.init_pos);
@@ -263,6 +264,7 @@ int jp2_read_bpcc(jp2_struct_t * jp2_struct)
   return 0;
 }
 
+/* 写入COLOR SPECIFICATION 框 */
 void jp2_write_colr(jp2_struct_t * jp2_struct)
 {
   jp2_box_t box;
@@ -314,7 +316,7 @@ int jp2_read_colr(jp2_struct_t * jp2_struct)
 
 /*
 * Write the JP2H box
-*
+* 写JP2 HEADER框
 * JP2 Header box
 *
 */
@@ -323,14 +325,15 @@ void jp2_write_jp2h(jp2_struct_t * jp2_struct)
   jp2_box_t box;
 
   box.init_pos = cio_tell();
-  cio_skip(4);;
+  cio_skip(4);
   cio_write(JP2_JP2H, 4);	/* JP2H */
 
   jp2_write_ihdr(jp2_struct);
 
   if (jp2_struct->bpc == 255)
-    jp2_write_bpcc(jp2_struct);
-  jp2_write_colr(jp2_struct);
+    jp2_write_bpcc(jp2_struct);//写入bits per component框
+
+  jp2_write_colr(jp2_struct);//写入
 
   box.length = cio_tell() - box.init_pos;
   cio_seek(box.init_pos);
@@ -373,7 +376,7 @@ int jp2_read_jp2h(jp2_struct_t * jp2_struct)
 
 /*
 * Write the FTYP box
-*
+* 输出File TYPE 文件类型框 
 * File type box
 *
 */
@@ -382,17 +385,18 @@ void jp2_write_ftyp(jp2_struct_t * jp2_struct)
   unsigned int i;
   jp2_box_t box;
 
+  //前边已经来到了file type 框前
   box.init_pos = cio_tell();
-  cio_skip(4);
+  cio_skip(4);//跳过长度框
   cio_write(JP2_FTYP, 4);	/* FTYP       */
 
-  cio_write(jp2_struct->brand, 4);	/* BR         */
-  cio_write(jp2_struct->minversion, 4);	/* MinV       */
+  cio_write(jp2_struct->brand, 4);	/* BR   ,定义所采用的具体文件格式      */
+  cio_write(jp2_struct->minversion, 4);	/* MinV,定义商标最小版本号       */
 
   for (i = 0; i < jp2_struct->numcl; i++)
-    cio_write(jp2_struct->cl[i], 4);	/* CL           */
+    cio_write(jp2_struct->cl[i], 4);	/* CL ,兼容列表          */
 
-  box.length = cio_tell() - box.init_pos;
+  box.length = cio_tell() - box.init_pos;//计算长度
   cio_seek(box.init_pos);
   cio_write(box.length, 4);	/*    L       */
   cio_seek(box.init_pos + box.length);
@@ -518,18 +522,19 @@ int jp2_read_jp2c(unsigned char *src, int len, jp2_struct_t * jp2_struct,
   return 0;
 }
 
+/*　写入signature框 */
 void jp2_write_jp()
 {
   jp2_box_t box;
 
-  box.init_pos = cio_tell();
-  cio_skip(4);
-  cio_write(JP2_JP, 4);		// JP
-  cio_write(0x0d0a870a, 4);
+  box.init_pos = cio_tell();//获取当前字节流入口
+  cio_skip(4);//跳过signature 长度框
+  cio_write(JP2_JP, 4);		// 写入'jp'
+  cio_write(0x0d0a870a, 4);//signature的C框内容
 
-  box.length = cio_tell() - box.init_pos;
-  cio_seek(box.init_pos);
-  cio_write(box.length, 4);	/*    L       */
+  box.length = cio_tell() - box.init_pos;//计算读取的长度
+  cio_seek(box.init_pos);//回到开始 
+  cio_write(box.length, 4);	/*    写入框长度       */
   cio_seek(box.init_pos + box.length);
 }
 
@@ -582,7 +587,7 @@ int jp2_encode(jp2_struct_t * jp2_struct, j2k_cp_t * cp, char *output,
 {
   int len;
 
-  jp2_write_jp();
+  jp2_write_jp();/*　写入signature框 */
   jp2_write_ftyp(jp2_struct);
   jp2_write_jp2h(jp2_struct);
   len = jp2_write_jp2c(jp2_struct->image, cp, output, index);
