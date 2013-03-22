@@ -251,6 +251,7 @@ void calc_explicit_stepsizes(j2k_tccp_t * tccp, int prec)
 
 int main(int argc, char **argv)
 {
+	
     int len;
 	int NumResolution, numD_min;	/*   NumResolution : number of resolution                     */
 	int Tile_arg;			/*   Tile_arg = 0 (not in argument) ou = 1 (in argument)      */
@@ -322,8 +323,6 @@ int main(int argc, char **argv)
 
 	cp.intermed_file=0;
 	use_index=0;
-
-
 
 	while (1) {
 		int c = getopt(argc, argv,

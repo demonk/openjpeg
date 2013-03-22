@@ -89,7 +89,7 @@ typedef struct {
 
 typedef struct {
   int x0, y0, x1, y1;		/* dimension of the resolution level : left upper corner (x0, y0) right low corner (x1,y1),分辨率维度 */
-  int pw, ph;			/* 分区尺寸宽,高 */
+  int pw, ph;			/* precinct width/height ,分区尺寸宽,高 */
   int numbands;			/* number sub-band for the resolution level,标记这是哪一个子带的 */
   tcd_band_t bands[3];		/* subband information ,子带信息*/
 } tcd_resolution_t;
