@@ -318,7 +318,7 @@ int main(int argc, char **argv)
 	cp_init.tcps = (j2k_tcp_t *) malloc(sizeof(j2k_tcp_t));	/* initialisation if only one tile */
 	tcp_init = &cp_init.tcps[0];
 	tcp_init->numlayers = 0;
-	jpwl_cp_init(&jpwl_cp);
+	jpwl_cp_init(&jpwl_cp);//容错工具初始化,默认不开启 
 
 	cp.intermed_file=0;
 	use_index=0;
@@ -657,6 +657,7 @@ int main(int argc, char **argv)
 			/* ------------------------------------------------------ */
 		case 'W':			/* version 0.2 enables only EPC on main header and epb in fixed way*/
 			{
+				//是否开启纠错
 				jpwl_cp.JPWL_on = 1;
 			}
 			break;
@@ -995,7 +996,8 @@ int main(int argc, char **argv)
 			fprintf(stderr, "failed to open %s for writing\n", outfile);	
 			return 1;				
 		}
-		fwrite(outbuf, 1, len, f);
+
+		fwrite(outbuf, 1, len, f);//把数据都写出到文件中
 		free(outbuf);
 		fclose(f);
 	}

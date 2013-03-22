@@ -60,16 +60,16 @@
 
 
 typedef struct {
-  int dx, dy;			/* XRsiz, YRsiz              */
+  int dx, dy;			/* XRsiz, YRsiz   ,表示横/竖向分别要跳多少个点才是下一个采样点           */
   int w, h;			/* width and height of data  */
   int x0, y0;			/* offset of the component compare to the whole image  */
-  int prec;			/* precision                 */
+  int prec;			/* precision   精准度              */
   int bpp;			/* deapth of image in bits   */
   int sgnd;			/* signed                    */
   int resno_decoded;		/* number of decoded resolution */
   int factor;			/* number of division by 2 of the out image  compare to the original size of image */
   int *data;			/* image-component data      */
-} j2k_comp_t;
+} j2k_comp_t;/* component */
 
 typedef struct {
   int x0, y0;			/* XOsiz, YOsiz   切片格子原点           */
@@ -81,9 +81,9 @@ typedef struct {
 
 
 typedef struct {
-  int expn;			/* exponent                  */
-  int mant;			/* mantissa                  */
-} j2k_stepsize_t;
+  int expn;			/* exponent      指数           */
+  int mant;			/* mantissa  ,尾数                */
+} j2k_stepsize_t;/*  量化步长类,目测可以表示浮点数 */
 
 typedef struct {
   int csty;			/* coding style                          */
@@ -91,14 +91,14 @@ typedef struct {
   int cblkw;			/* width of code-blocks                  */
   int cblkh;			/* height of code-blocks                 */
   int cblksty;			/* code-block coding style               */
-  int qmfbid;			/* discrete wavelet transform identifier */
+  int qmfbid;			/* discrete wavelet transform identifier ,分享小波变换标识*/
   int qntsty;			/* quantisation style                    */
   j2k_stepsize_t stepsizes[J2K_MAXBANDS];	/* stepsizes used for quantization       */
   int numgbits;			/* number of guard bits                  */
   int roishift;			/* Region Of Interest shift              */
   int prcw[J2K_MAXRLVLS];	/* Precinct width                        */
   int prch[J2K_MAXRLVLS];	/* Precinct height                       */
-} j2k_tccp_t;
+} j2k_tccp_t;/* tile component coding 参数*/
 
 typedef struct {
   int resno0, compno0;
@@ -153,7 +153,7 @@ typedef struct {
 
   j2k_tcp_t *tcps;		/* tile coding parameters                                                  */
   int *matrice;			/* Fixed layer                                                             */
-} j2k_cp_t;//component,/* 分量 */
+} j2k_cp_t;//component,/* coding parameters ,可以看作分量 */
 
 typedef struct {
   int start_pos, end_pos;	/* start and end position            */
@@ -189,7 +189,7 @@ typedef struct {
   int Main_head_end;		/* Main header position                                  */
   int codestream_size;		/* codestream's size                                     */
   info_tile *tile;		/* information concerning tiles inside image             */
-} info_image;			/* index struct                                          */
+} info_image;			/* index struct  ,索引结构                                        */
 
 // index struct correction
 void pack_corr(unsigned long corr, int tileno);

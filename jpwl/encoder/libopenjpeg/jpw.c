@@ -171,7 +171,12 @@ static long CrcT32[256] = {0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
 
 
 /* inizializza i parametri relativi al JPWL *
- * disabilitando le funzionalit?           */
+ * disabilitando le funzionalit?   
+ JPWL是一个由DSP实验室发展与维持的一个模块,作用:
+ 1.保护编码流防止传输错误
+ 2.描述码流中不同部分的不同敏感度
+ 3.
+ */
 
 void jpwl_cp_init(JPWL_cp_t *jpwl_cp){
 	jpwl_cp->JPWL_on = 0;

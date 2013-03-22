@@ -70,7 +70,7 @@ int int_abs(int a)
 
 /*
  * Divide an integer and round upwards.
- * 
+ * 除以一个整数返回一个朝无穷正方向舍去的数
  * a divided by b
  */
 int int_ceildiv(int a, int b)
@@ -90,7 +90,7 @@ int int_ceildivpow2(int a, int b)
 
 /*
  * Divide an integer by a power of 2 and round downwards.
- *
+ * return a/2^b
  * a divided by 2^b
  */
 int int_floordivpow2(int a, int b)

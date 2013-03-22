@@ -272,11 +272,11 @@ void dwt_decode(int *a, int w, int h, tcd_tilecomp_t * tilec, int l,
 /* </summary>                         */
 int dwt_getgain(int orient)
 {
-  if (orient == 0)
+  if (orient == 0)//LL
     return 0;
-  if (orient == 1 || orient == 2)
+  if (orient == 1 || orient == 2)//HL,LH
     return 1;
-  return 2;
+  return 2;//HH
 }
 
 /* <summary>                */

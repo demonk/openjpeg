@@ -35,16 +35,16 @@
 
 
 typedef struct {
-	unsigned int JPWL_on;		//indica se usare le funzionalit?JPWL e quindi l'EPC nel main header
-	unsigned int EPB_on;
-	unsigned int ESD_on;
-	unsigned int RED_on;
-	unsigned int UEP_on;
+	unsigned int JPWL_on;/* 是否开启JPEG2000 Wireless */		//indica se usare le funzionalit?JPWL e quindi l'EPC nel main header
+	unsigned int EPB_on;/* Error Protection Block */
+	unsigned int ESD_on;/* Error Sensitivity Descriptor */
+	unsigned int RED_on;/* Residual Error Descriptor */
+	unsigned int UEP_on;/* Unequal Error Protection */
 	unsigned int info_tech_on;
 	unsigned long pepb[6];
 	unsigned char pesd;
 	unsigned char pred;
-} JPWL_cp_t;
+} JPWL_cp_t;/* JPEG2000  容错工具 */
 
 
 // inizializza la struttura contenente le info riguardanti l'uso dei marker jpwl

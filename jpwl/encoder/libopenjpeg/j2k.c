@@ -96,7 +96,7 @@ j2k_cp_t *j2k_cp;
 static unsigned char **j2k_tile_data;
 static int *j2k_tile_len;
 
- info_image info_IM;
+info_image info_IM;
 
 /* Add Patrick */
 void j2k_clean()
@@ -821,6 +821,7 @@ void j2k_write_sot()
   cio_seek(lenp + len);
 }
 
+/* 读取拼接头SOT标记 */
 void j2k_read_sot()
 {
   int len, tileno, totlen, partno, numparts, i;
@@ -1403,29 +1404,48 @@ if (info_IM.Prog == 0) {	/* LRCP */
 	  }
 }
 
-
+/* JP2编码函数 */
 LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
 			  int len, char *index)
 {
-  unsigned long len_data, i, len_data2, Psot_corr, x, cod_len;
-  int tileno, compno, set_epb, cur_pos, end_tph, len_esd, lmax, no_epb, cont, depb, mask, h=0;
+  unsigned long len_data,
+	  i,
+	  len_data2,
+	  Psot_corr,
+	  x,
+	  cod_len;
+
+  int tileno, 
+	  compno, 
+	  set_epb,//error protection block
+	  cur_pos,
+	  end_tph, 
+	  len_esd, 
+	  lmax, 
+	  no_epb,
+	  cont,
+	  depb, 
+	  mask, 
+	  h=0;
+
   char *dest = NULL, *buf = NULL, *save=NULL, *data=NULL;
-  //FILE *INDEX = NULL;
+
   FILE *f = NULL;
 
-  if (setjmp(j2k_error)) {
+  if (setjmp(j2k_error)) {//系统函数,输出错误
     return 0;
   }
 
-  if (cp->intermed_file==1) {
+  if (cp->intermed_file==1) {//是否合并文件
     f = fopen(output, "wb");
     if (!f) {
       fprintf(stderr, "failed to open %s for writing\n", output);
       return 1;
     }
-    dest = (char *) malloc(len);
-    cio_init(dest, len);
+    dest = (char *) malloc(len);//为图像域申请空间
+    cio_init(dest, len);//设置首尾指针及当前指针
   }
+
   pos_correction=0;
   j2k_img = img;
   j2k_cp = cp;
@@ -1434,9 +1454,8 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
 
   /* INDEX >> */
   info_IM.index_on = j2k_cp->index_on;
-  if (info_IM.index_on) {
-    info_IM.tile =
-      (info_tile *) malloc(j2k_cp->tw * j2k_cp->th * sizeof(info_tile));
+  if (info_IM.index_on) {//判断是否需要index 
+    info_IM.tile =(info_tile *) malloc(j2k_cp->tw * j2k_cp->th * sizeof(info_tile));//为多个tile申请info空间
     info_IM.Im_w = j2k_img->x1 - j2k_img->x0;
     info_IM.Im_h = j2k_img->y1 - j2k_img->y0;
     info_IM.Prog = (&j2k_cp->tcps[0])->prg;
@@ -1450,29 +1469,34 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
     info_IM.D_max = 0;		/* ADD Marcela */
   }
   /* << INDEX */
+
   //if (info_IM.index_on && !(cp->intermed_file))
 	//  get_info(&info_IM);
 
-  j2k_state = J2K_STATE_MHSOC;
-  j2k_write_soc();
-  j2k_state = J2K_STATE_MHSIZ;
+  j2k_state = J2K_STATE_MHSOC;//SOC码流开始 
+  j2k_write_soc();//写入SOC,码流开始标记
+  j2k_state = J2K_STATE_MHSIZ;//SIZ标记,图像和拼接块大小
   j2k_write_siz();
   j2k_state = J2K_STATE_MH;
+
   set_epb=cio_tell();
 
   // scrivo i marker jpwl direttamente solo se uso gli intermed files
   if (jpwl_cp.JPWL_on && cp->intermed_file)				// se ?attiva l'opzione jpwl allora scrive l'epc
-	  jpwl_write_EPC();
+	  jpwl_write_EPC();//如果开启错误纠正编码,则要写入纠结信息
   
-  j2k_write_cod();
-  j2k_write_qcd();
+  j2k_write_cod();//COD标记,写入默认编码形式
+  j2k_write_qcd();//QCD标记,写入默认量化 
+
   for (compno = 0; compno < j2k_img->numcomps; compno++) {
-    j2k_tcp_t *tcp = &j2k_cp->tcps[0];
+	  //遍历分量数
+    j2k_tcp_t *tcp = &j2k_cp->tcps[0];//Tile Component
     if (tcp->tccps[compno].roishift)
-      j2k_write_rgn(compno, 0);
-  }
+      j2k_write_rgn(compno, 0);//是否开始ROI,RGN标记
+  }//for end //遍历分量数
+
   if (j2k_cp->comment != NULL)
-    j2k_write_com();
+    j2k_write_com();//写入简介描述
   
   if (jpwl_cp.EPB_on && cp->intermed_file){
   /* inserimento EPB */
@@ -1491,8 +1515,6 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
 	free(buf);
   }
 
-
-
   if (cp->intermed_file==1) {
     /* Writing the main header */
     pos_correction = cio_tell();
@@ -1507,22 +1529,25 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
 
 
   for (tileno = 0; tileno < cp->tw * cp->th; tileno++) {
+	  //遍历tile
     fprintf(stderr, "Tile number %d / %d ", tileno + 1,
       cp->tw * cp->th);
     
     if (cp->intermed_file==1) {
       /* new dest for each tile  */
       free(dest);
-      dest = (char *) malloc(len);
-      cio_init(dest, len);
+      dest = (char *) malloc(len);//重新申请图像域空间
+      cio_init(dest, len);// 初始化dest
     }
-    j2k_curtileno = tileno;
+
+    j2k_curtileno = tileno;//当前分量number
     /* initialisation before tile encoding  */
 
     if (tileno == 0) {
-      tcd_malloc_encode(j2k_img, j2k_cp, j2k_curtileno);
+		//			   (raw image,coding parameter,标识当前的tile)
+      tcd_malloc_encode(j2k_img, j2k_cp, j2k_curtileno);//如果是第一个tile就重新分配 
     } else {
-      tcd_init_encode(j2k_img, j2k_cp, j2k_curtileno);
+      tcd_init_encode(j2k_img, j2k_cp, j2k_curtileno);//如果非第一个就重用之前分配的
     }
 
     /* INDEX >> */
@@ -1530,23 +1555,27 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
       info_IM.tile[j2k_curtileno].num_tile = j2k_curtileno;
       info_IM.tile[j2k_curtileno].start_pos = cio_tell() + pos_correction;
     }
+
     /* << INDEX */
-	j2k_state = J2K_STATE_TPHSOT;
+	j2k_state = J2K_STATE_TPHSOT;//SOT标记,拼接块标头
     j2k_write_sot();
 	j2k_state = J2K_STATE_TPH;
 	set_epb=cio_tell();
 
     for (compno = 1; compno < img->numcomps; compno++) {
-      j2k_write_coc(compno);
-      j2k_write_qcc(compno);
+      j2k_write_coc(compno);//COC标记,可选,编码形式分量
+      j2k_write_qcc(compno);//QCC标记,可选,量化分量
     }
 
-    if (cp->tcps[tileno].numpocs)
-      j2k_write_poc();
+    if (cp->tcps[tileno].numpocs)// 如果设置了POC
+      j2k_write_poc();//POC标记,可选,渐进顺序改变
+
 	end_tph=cio_tell();
-    j2k_write_sod();
+    j2k_write_sod();//SOD标记,拼接头,数据起始
 	
+	//先可省
 	//inserimento ESD se uso l'intermed file o se uso il packet range mode(problema dell'indice di pacchettto)
+
 	if ((jpwl_cp.ESD_on && cp->intermed_file)||(((jpwl_cp.pesd & 0xC0)>>6)==2)){
 		cur_pos = cio_tell();
 		len_data = cur_pos - set_epb;
@@ -1578,7 +1607,6 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
 			pack_corr(len_esd, tileno);
 			}
 		}
-		
 		cio_seek(cur_pos + len_esd);
 	}
 	
@@ -1662,7 +1690,6 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
     free(save);
 	}
 
-
     /* INDEX >> */
     if (info_IM.index_on) {
       info_IM.tile[j2k_curtileno].end_pos = cio_tell() + pos_correction - 1;
@@ -1692,21 +1719,22 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
        }
      */
     if (cp->intermed_file==1) {
-      fwrite(dest, 1, cio_tell(), f);
-      pos_correction = cio_tell() + pos_correction;
+      fwrite(dest, 1, cio_tell(), f);//写出当前指针之前的数据
+      pos_correction = cio_tell() + pos_correction;//更新当前指针位置 
     }
-  }
+  }//for end ,遍历tile结束
 
   if (cp->intermed_file==1) {
+	  //重新分配
     free(dest);
     dest = (char *) malloc(len);
     cio_init(dest, len);
   }
 
-  j2k_write_eoc();
+  j2k_write_eoc();//标记码流结束
 
   if (cp->intermed_file==1) {
-    fwrite(dest, 1, 2, f);
+    fwrite(dest, 1, 2, f);//写出1*2个字节
     free(dest);
     /* closing file *.j2k */
     fclose(f);
@@ -1716,7 +1744,7 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
 
   if ((info_IM.index_on && use_index && cp->intermed_file) || (info_IM.index_on && use_index &&!(jpwl_cp.JPWL_on))){
 	cod_len = cio_tell() + pos_correction;
-	//printf("num: %d\n",info_IM.num);
+	printf("num: %d\n",info_IM.num);
 	write_index(index, cod_len);
   }
    

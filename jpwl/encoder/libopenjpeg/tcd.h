@@ -82,25 +82,25 @@ typedef struct {
 typedef struct {
   int x0, y0, x1, y1;		/* dimension of the subband : left upper corner (x0, y0) right low corner (x1,y1) */
   int bandno;
-  tcd_precinct_t *precincts;	/* precinct information */
+  tcd_precinct_t *precincts;	/* precinct information,分区信息 */
   int numbps;
-  int stepsize;
-} tcd_band_t;
+  int stepsize; /*步长*/
+} tcd_band_t;/* 子带 */
 
 typedef struct {
-  int x0, y0, x1, y1;		/* dimension of the resolution level : left upper corner (x0, y0) right low corner (x1,y1) */
-  int pw, ph;
-  int numbands;			/* number sub-band for the resolution level */
-  tcd_band_t bands[3];		/* subband information */
+  int x0, y0, x1, y1;		/* dimension of the resolution level : left upper corner (x0, y0) right low corner (x1,y1),分辨率维度 */
+  int pw, ph;			/* 分区尺寸宽,高 */
+  int numbands;			/* number sub-band for the resolution level,标记这是哪一个子带的 */
+  tcd_band_t bands[3];		/* subband information ,子带信息*/
 } tcd_resolution_t;
 
 typedef struct {
-  int x0, y0, x1, y1;		/* dimension of component : left upper corner (x0, y0) right low corner (x1,y1) */
-  int numresolutions;		/* number of resolutions level */
-  tcd_resolution_t *resolutions;	/* resolutions information */
-  int *data;			/* data of the component */
+  int x0, y0, x1, y1;		/* dimension of component : left upper corner (x0, y0) right low corner (x1,y1),分量维度参数  */
+  int numresolutions;		/* number of resolutions level ,分辨率层次*/
+  tcd_resolution_t *resolutions;	/* resolutions information ,分辨率信息*/
+  int *data;			/* data of the component ,分量数据 */
   int nbpix;			/* add fixed_quality */
-} tcd_tilecomp_t;
+} tcd_tilecomp_t;/* tile 的分量信息 */
 
 typedef struct {
   int x0, y0, x1, y1;		/* dimension of the tile : left upper corner (x0, y0) right low corner (x1,y1) */
@@ -114,7 +114,7 @@ typedef struct {
 typedef struct {
   int tw, th;			/* number of tiles in width and heigth */
   tcd_tile_t *tiles;		/* Tiles information */
-} tcd_image_t;
+} tcd_image_t;/* tile分量图像 */
 
 /*
  * Initialize the tile coder (reuses the memory allocated by tcd_malloc_encode)

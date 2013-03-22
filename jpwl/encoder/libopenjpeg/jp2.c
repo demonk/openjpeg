@@ -273,12 +273,12 @@ void jp2_write_colr(jp2_struct_t * jp2_struct)
   cio_skip(4);
   cio_write(JP2_COLR, 4);	// COLR
 
-  cio_write(jp2_struct->meth, 1);	// METH
+  cio_write(jp2_struct->meth, 1);	// METH,M参数
   cio_write(jp2_struct->precedence, 1);	// PRECEDENCE
   cio_write(jp2_struct->approx, 1);	// APPROX
 
   if (jp2_struct->meth == 1)
-    cio_write(jp2_struct->enumcs, 4);	// EnumCS
+    cio_write(jp2_struct->enumcs, 4);	// EnumCS,ECS
   else
     cio_write(0, 1);		// PROFILE (??)
 
@@ -333,7 +333,7 @@ void jp2_write_jp2h(jp2_struct_t * jp2_struct)
   if (jp2_struct->bpc == 255)
     jp2_write_bpcc(jp2_struct);//写入bits per component框
 
-  jp2_write_colr(jp2_struct);//写入
+  jp2_write_colr(jp2_struct);//写入 COLOR SPECIFICATION 框 
 
   box.length = cio_tell() - box.init_pos;
   cio_seek(box.init_pos);
@@ -436,8 +436,7 @@ int jp2_read_ftyp(jp2_struct_t * jp2_struct)
   return 0;
 }
 
-int jp2_write_jp2c(j2k_image_t * img, j2k_cp_t * cp, char *jp2_buffer,
-		   char *index)
+int jp2_write_jp2c(j2k_image_t * img, j2k_cp_t * cp, char *jp2_buffer,char *index)
 {
   int len, i, set;
   char *cstr, *out;
@@ -446,7 +445,9 @@ int jp2_write_jp2c(j2k_image_t * img, j2k_cp_t * cp, char *jp2_buffer,
   box.init_pos = cio_tell();
   cio_skip(4);
   cio_write(JP2_JP2C, 4);	// JP2C
+
   if (jpwl_cp.JPWL_on){
+	  //如果开启容错纠正
 	set=cio_tell();
 	cstr = (char *) malloc( cp->tdx * cp->tdy * cp->tw * cp->th * 10*sizeof(char)); /* Allocate memory for all tiles */
     cio_init(cstr, cp->tdx * cp->tdy * cp->tw * cp->th * 10);							 
@@ -490,9 +491,14 @@ int jp2_write_jp2c(j2k_image_t * img, j2k_cp_t * cp, char *jp2_buffer,
 	free(cstr);
 	free(out);
   }
+
   else{
-	len = j2k_encode(img, cp, jp2_buffer, cp->tdx * cp->tdy * cp->th * cp->tw * 2, index);
+	  //如果不容错
+				  //(图像,分量对象,输出文件名 ,图像域大小,码流索引文件)
+	len = j2k_encode(img, cp, jp2_buffer, cp->tdx * cp->tdy * cp->th * cp->tw * 2, index);//数据长度,单位byte
   }
+
+
   box.length = cio_tell() - box.init_pos;
   cio_seek(box.init_pos);
   cio_write(box.length, 4);	/*    L       */
