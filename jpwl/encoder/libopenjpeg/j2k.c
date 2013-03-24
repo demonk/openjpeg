@@ -875,6 +875,7 @@ void j2k_read_sot()
   }
 }
 
+/* 写入SOD标记及开始准备数据 */
 void j2k_write_sod()
 {
   int l, layno;
@@ -882,9 +883,10 @@ void j2k_write_sod()
   j2k_tcp_t *tcp;
   static int j2k_sod_start;
 
-  cio_write(J2K_MS_SOD, 2);
-  if (j2k_curtileno == 0) {
-    j2k_sod_start = cio_tell() + pos_correction;
+  cio_write(J2K_MS_SOD, 2);//写入SOD码流标记 
+
+  if (j2k_curtileno == 0) {//如果是第一个tile
+    j2k_sod_start = cio_tell() + pos_correction;//记录SOD开始的位置
   }
 
   /* INDEX >> */
@@ -900,13 +902,13 @@ void j2k_write_sod()
 
   tcp = &j2k_cp->tcps[j2k_curtileno];
   for (layno = 0; layno < tcp->numlayers; layno++) {
-    tcp->rates[layno] -= (j2k_sod_start / (j2k_cp->th * j2k_cp->tw));
+	  //遍历质量层
+    tcp->rates[layno] = tcp->rates[layno]-(j2k_sod_start / (j2k_cp->th * j2k_cp->tw));
   }
 
   info_IM.num = 0;
   if (j2k_cp->image_type)//输入图像后缀为非pgx
-    l = tcd_encode_tile_pxm(j2k_curtileno, cio_getbp(),
-			    cio_numbytesleft() - 2, &info_IM);//jp2用的是这种编码方式方式
+    l = tcd_encode_tile_pxm(j2k_curtileno, cio_getbp(),cio_numbytesleft() - 2, &info_IM);//jp2用的是这种编码方式方式
   else
     l = tcd_encode_tile_pgx(j2k_curtileno, cio_getbp(),
 			    cio_numbytesleft() - 2, &info_IM);
@@ -1545,7 +1547,6 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
     if (tileno == 0) {// (raw image,coding parameter,标识当前的tile)
       tcd_malloc_encode(j2k_img, j2k_cp, j2k_curtileno);//如果是第一个tile就重新分配 ,初始化tile coder
     } else {
-	
       tcd_init_encode(j2k_img, j2k_cp, j2k_curtileno);//如果非第一个就重用之前分配的,初始化tile coder
     }
 
@@ -1701,24 +1702,6 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
     }
     /* << INDEX */
 
-    /*
-       if (tile->PPT)  BAD PPT !!!
-       {
-       FILE *PPT_file;
-
-       int i;
-       PPT_file=fopen("PPT","rb");
-       fprintf(stderr,"%c%c%c%c",255,97,tile->len_ppt/256,tile->len_ppt%256);
-       for (i=0;i<tile->len_ppt;i++)
-       {
-       unsigned char elmt;
-       fread(&elmt, 1, 1, PPT_file);
-       fwrite(&elmt,1,1,f);
-       }
-       fclose(PPT_file);
-       unlink("PPT");
-       }
-     */
     if (cp->intermed_file==1) {
       fwrite(dest, 1, cio_tell(), f);//将dest中的数据写出cio_tell个字节的数据
       pos_correction = cio_tell() + pos_correction;//更新当前指针位置 

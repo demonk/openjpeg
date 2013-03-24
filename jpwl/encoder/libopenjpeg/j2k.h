@@ -60,7 +60,7 @@
 
 
 typedef struct {
-  int dx, dy;			/* XRsiz, YRsiz   ,表示横/竖向分别要跳多少个点才是下一个采样点           */
+  int dx, dy;			/* XRsiz, YRsiz   ,每一个分量都会有一个采样率,可以与其他分量不相等,表示横/竖向分别要跳多少个点才是下一个采样点,范围1~255           */
   int w, h;			/* width and height of data  */
   int x0, y0;			/* offset of the component compare to the whole image  */
   int prec;			/* precision   精准度              */
@@ -72,8 +72,8 @@ typedef struct {
 } j2k_comp_t;/* component */
 
 typedef struct {
-  int x0, y0;			/* XOsiz, YOsiz   切片格子原点           */
-  int x1, y1;			/* Xsiz, Ysiz  网格大小              */
+  int x0, y0;			/* XOsiz, YOsiz   真实图像原点 */
+  int x1, y1;			/* Xsiz, Ysiz  网格大小  */
   int numcomps;			/* number of components ,分量总数,在RGB当中有三个分量,分别为R,G,B,在灰度中只有高度分量     */
   int color_space;		/* sRGB, Greyscale or YUV,色域 */
   j2k_comp_t *comps;		/* image-components          */

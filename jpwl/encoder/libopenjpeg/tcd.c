@@ -42,19 +42,19 @@
 
 static tcd_image_t tcd_image;
 
-static j2k_image_t *tcd_img;
-static j2k_cp_t *tcd_cp;
+static j2k_image_t *tcd_img;/* 当前分量图像,在tcd_malloc_encode中定义 */
+static j2k_cp_t *tcd_cp;/*  当前分量 */
 
 static tcd_tile_t *tcd_tile;
-static j2k_tcp_t *tcd_tcp;
-static int tcd_tileno;
+static j2k_tcp_t *tcd_tcp;/* 当前切片分量*/
+static int tcd_tileno;/* 当前切片号*/
 
 static tcd_tile_t *tile;
-static tcd_tilecomp_t *tilec;
-static tcd_resolution_t *res;
-static tcd_band_t *band;
-static tcd_precinct_t *prc;
-static tcd_cblk_t *cblk;
+static tcd_tilecomp_t *tilec;/* tile 的信息分量*/
+static tcd_resolution_t *res;/* tile 的分辨率 */
+static tcd_band_t *band;/* tile 的子带*/
+static tcd_precinct_t *prc;/* tile 的分区 */
+static tcd_cblk_t *cblk;/* tile 的code block 信息 */
 
 extern jmp_buf j2k_error;
 
@@ -1119,8 +1119,7 @@ void tcd_rateallocate(unsigned char *dest, int len, info_image * info_IM)
 }
 
 /* pxm核心编码算法 */
-int tcd_encode_tile_pxm(int tileno, unsigned char *dest, int len,
-			info_image * info_IM)
+int tcd_encode_tile_pxm(int tileno, unsigned char *dest, int len,info_image * info_IM)
 {
   int compno;
   int l,i;
@@ -1130,9 +1129,10 @@ int tcd_encode_tile_pxm(int tileno, unsigned char *dest, int len,
   j2k_tccp_t *tccp = &tcp->tccps[0];
 
   tcd_tileno = tileno;
-  tcd_tile = tcd_image.tiles;
+  tcd_tile = tcd_image.tiles;//tile 信息
   tcd_tcp = &tcd_cp->tcps[tileno];
   tile = tcd_tile;
+
   /* INDEX >> "Precinct_nb_X et Precinct_nb_Y" */
   if (info_IM->index_on) {
     tcd_tilecomp_t *tilec_idx = &tile->comps[0];  //Based on Component 0
@@ -1156,24 +1156,25 @@ int tcd_encode_tile_pxm(int tileno, unsigned char *dest, int len,
   time7 = clock();
 
   for (compno = 0; compno < tile->numcomps; compno++) {
+	  //遍历分量
     FILE *src;
     char tmp[256];
     int k;
     unsigned char elmt;
     int i, j;
     int tw, w;
-    tcd_tilecomp_t *tilec = &tile->comps[compno];
-    int adjust =
-      tcd_img->comps[compno].sgnd ? 0 : 1 << (tcd_img->comps[compno].
-					      prec - 1);
-    int offset_x, offset_y;
+    tcd_tilecomp_t *tilec = &tile->comps[compno];//获取 tile 分量
+    int adjust = tcd_img->comps[compno].sgnd ? 0 : 1 << (tcd_img->comps[compno]. prec - 1);//???????
+    int offset_x, offset_y;//???????????
 
+	//////???????????????????????
     offset_x = int_ceildiv(tcd_img->x0, tcd_img->comps[compno].dx);
-    offset_y = int_ceildiv(tcd_img->y0, tcd_img->comps[compno].dy);
-    tw = tilec->x1 - tilec->x0;
-    w = int_ceildiv(tcd_img->x1 - tcd_img->x0, tcd_img->comps[compno].dx);
+    offset_y = int_ceildiv(tcd_img->y0, tcd_img->comps[compno].dy);//计算分量采样
+
+    tw = tilec->x1 - tilec->x0;//分量的宽度
+    w = int_ceildiv(tcd_img->x1 - tcd_img->x0, tcd_img->comps[compno].dx);//(真实图像的宽度/横向采样点)
     sprintf(tmp, "Compo%d", compno);	/* component file */
-    src = fopen(tmp, "rb");
+    src = fopen(tmp, "rb");//缓冲区
     if (!src) {
       fprintf(stderr, "failed to open %s for reading\n", tmp);
       return 1;
@@ -1181,29 +1182,27 @@ int tcd_encode_tile_pxm(int tileno, unsigned char *dest, int len,
 
     /* read the Compo file to extract data of the tile */
     k = 0;
-    fseek(src, (tilec->x0 - offset_x) + (tilec->y0 - offset_y) * w,
-	  SEEK_SET);
+    fseek(src, (tilec->x0 - offset_x) + (tilec->y0 - offset_y) * w,SEEK_SET);//在缓冲区内跳过
     k = (tilec->x0 - offset_x) + (tilec->y0 - offset_y) * w;
-    for (j = tilec->y0; j < tilec->y1; j++) {
-      for (i = tilec->x0; i < tilec->x1; i++) {
-	if (tcd_tcp->tccps[compno].qmfbid == 1) {
-	  elmt = fgetc(src);
-	  tilec->data[i - tilec->x0 + (j - tilec->y0) * tw] =
-	    elmt - adjust;
-	  k++;
-	} else if (tcd_tcp->tccps[compno].qmfbid == 0) {
-	  elmt = fgetc(src);
-	  tilec->data[i - tilec->x0 + (j - tilec->y0) * tw] =
-	    (elmt - adjust) << 13;
-	  k++;
-	}
-      }
-      fseek(src, (tilec->x0 - offset_x) + (j + 1 - offset_y) * w - k,
-	    SEEK_CUR);
-      k = tilec->x0 - offset_x + (j + 1 - offset_y) * w;
 
-    }
-    fclose(src);
+    for (j = tilec->y0; j < tilec->y1; j++) {//逐行扫描分量信息
+      for (i = tilec->x0; i < tilec->x1; i++) {//逐列扫描
+		if (tcd_tcp->tccps[compno].qmfbid == 1) {
+		  elmt = fgetc(src);//从缓冲获取一个字节
+			tilec->data[i - tilec->x0 + (j - tilec->y0) * tw] =elmt - adjust;//tile图像分量信息数据
+			 k++;
+		} else if (tcd_tcp->tccps[compno].qmfbid == 0) {
+		  elmt = fgetc(src);
+		  tilec->data[i - tilec->x0 + (j - tilec->y0) * tw] =
+		   (elmt - adjust) << 13;
+		  k++;
+		}
+	   }
+		  fseek(src, (tilec->x0 - offset_x) + (j + 1 - offset_y) * w - k,
+		    SEEK_CUR);
+		  k = tilec->x0 - offset_x + (j + 1 - offset_y) * w;
+	  }
+	  fclose(src);
   }
 
 /*----------------MCT-------------------*/
