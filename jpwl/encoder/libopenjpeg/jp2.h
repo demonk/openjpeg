@@ -53,7 +53,7 @@ typedef struct {
   unsigned int *cl;//具体兼容的参数
   jp2_comps_t *comps;
   j2k_image_t *image;
-} jp2_struct_t;/*  */
+} jp2_struct_t;/* JP2框结构 */
 
 /*框结构*/
 typedef struct {

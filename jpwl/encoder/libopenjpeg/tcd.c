@@ -116,6 +116,7 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 
   for (tileno = 0; tileno < 1; tileno++) {
     j2k_tcp_t *tcp = &cp->tcps[curtileno];//获取当前tile分量
+
     int j;
     /* cfr p59 ISO/IEC FDIS15444-1 : 2000 (18 august 2000) */
     int p = curtileno % cp->tw;	/* si numerotation matricielle .. */
@@ -126,56 +127,55 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
     tile = tcd_image.tiles;//获取tile空间指针
 
     /* 4 borders of the tile rescale on the image if necessary */
-	//如果必须的话把tile的边框定在图像里
+	//如果必须的话把tile的边框定在图像里(5.23),计算每一个tile的原点(x0,y0)与结束点(x1,y1)
+	//计算图像在分量中的坐标(公式:5.23)
     tile->x0 = int_max(cp->tx0 + p * cp->tdx, img->x0);//如果图像的X起码点>当前tile的X坐标,则tile的X定为图像的起始点
     tile->y0 = int_max(cp->ty0 + q * cp->tdy, img->y0);//
     tile->x1 = int_min(cp->tx0 + (p + 1) * cp->tdx, img->x1);//如果网格的结束X<图像域的X,则返回网格的X
     tile->y1 = int_min(cp->ty0 + (q + 1) * cp->tdy, img->y1);
-    tile->numcomps = img->numcomps;
-    /* tile->PPT=img->PPT;  */
 
-    /* Modification of the RATE >> */
+    tile->numcomps = img->numcomps;
+
 	//设定RATE,对每个质量层进行赋值
     for (j = 0; j < tcp->numlayers; j++) {
-
       tcp->rates[j] =int_ceildiv(
 		  tile->numcomps * (tile->x1 - tile->x0) *(tile->y1 - tile->y0) * img->comps[0].prec, //分量总数*(tile宽)*(tile高)*图像0号分量精准度
 		  tcp->rates[j] * 8 * img->comps[0].dx *img->comps[0].dy);//tile切片分量参数第J号质量*8(BIT)*图像0号分量水平采样周期*图像0号分量垂直采样周期 
       
-	  if (j && tcp->rates[j] < tcp->rates[j - 1] + 10) {//非第一个层且层质量<上一个层质量+10
+	  if (j && tcp->rates[j] < tcp->rates[j - 1] + 10) {//非第一个层且层质量小于(上一个层质量+10)
 			tcp->rates[j] = tcp->rates[j - 1] + 20;//当前质量层的质量为前一层+20
       } else {
 		if (!j && tcp->rates[j] < 30)//如果是第一层且第一层质量<30
 			tcp->rates[j] = 30;//第一层为30
       }
-    }
-    /* << Modification of the RATE */
 
-    tile->comps =(tcd_tilecomp_t *) malloc(img->numcomps * sizeof(tcd_tilecomp_t));//针对不同分量上的同一级别tile
+    }
+
+    tile->comps =(tcd_tilecomp_t *) malloc(img->numcomps * sizeof(tcd_tilecomp_t));//针对不同分量上的同一位置的tile分量信息
 
 	//遍历不同分量上同一级别的tile
     for (compno = 0; compno < tile->numcomps; compno++) {
       j2k_tccp_t *tccp = &tcp->tccps[compno];//取得一个分量上的tile对象
-      /* tcd_tilecomp_t *tilec=&tile->comps[compno]; */
 
       tilec = &tile->comps[compno];// 取得当前分量上的tile信息空间
       /* border of each tile component (global) */
 
+	  //计算左上采样坐标与右下采样坐标(映射到具体分量上的坐标,每个分量上根据不同的采样率不同分量同一位置坐标可能不一致)(5.24)
       tilec->x0 = int_ceildiv(tile->x0, img->comps[compno].dx);//[tile左上X/水平方向采样点]
       tilec->y0 = int_ceildiv(tile->y0, img->comps[compno].dy);
       tilec->x1 = int_ceildiv(tile->x1, img->comps[compno].dx);
       tilec->y1 = int_ceildiv(tile->y1, img->comps[compno].dy);
 
-      tilec->data =(int *) malloc((tilec->x1 - tilec->x0) * (tilec->y1 - tilec->y0) * sizeof(int));//分量dimension大小*int
+      tilec->data =(int *) malloc((tilec->x1 - tilec->x0) * (tilec->y1 - tilec->y0) * sizeof(int));//对应分量tile在其对应采样率下的大小*sizeof(int)
 
-      tilec->numresolutions = tccp->numresolutions;
+      tilec->numresolutions = tccp->numresolutions;//分辨率层数
 
       tilec->resolutions =(tcd_resolution_t *) malloc(tilec->numresolutions * sizeof(tcd_resolution_t));
 
       for (resno = 0; resno < tilec->numresolutions; resno++) {
 		  //遍历分辨率
 		int pdx, pdy;//分区宽高
-		int levelno = tilec->numresolutions - 1 - resno;//当前分辨率层次
+		int levelno = tilec->numresolutions - 1 - resno;//当前分辨率层次,numresolutions,numresolutions-1,......,0
 
 		int tlprcxstart, tlprcystart, brprcxend, brprcyend;
 		int tlcbgxstart, tlcbgystart, brcbgxend, brcbgyend;
@@ -199,14 +199,15 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 	  pdy = tccp->prch[resno];//当前分辨率层次下的分区高度
 	} else {
 	  pdx = 15;//否则默认分区大小为15*15
-	  pdy = 15;
+	  pdy = 15;//0x1111
 	}
 
 	/* p. 64, B.6, ISO/IEC FDIS15444-1 : 2000 (18 august 2000)  */
-	tlprcxstart = int_floordivpow2(res->x0, pdx) << pdx;//(a/2^b)<<pdx
-	tlprcystart = int_floordivpow2(res->y0, pdy) << pdy;
-	brprcxend = int_ceildivpow2(res->x1, pdx) << pdx;
-	brprcyend = int_ceildivpow2(res->y1, pdy) << pdy;
+	//定义
+	tlprcxstart = int_floordivpow2(res->x0, pdx) << pdx;//(a/2^b)左移pdx,top left precinct cx start
+	tlprcystart = int_floordivpow2(res->y0, pdy) << pdy;//top left precinct cy start
+	brprcxend = int_ceildivpow2(res->x1, pdx) << pdx;//bottom right precinct cx start
+	brprcyend = int_ceildivpow2(res->y1, pdy) << pdy;//bottom right precinct cy start
 
 	res->pw = (brprcxend - tlprcxstart) >> pdx;
 	res->ph = (brprcyend - tlprcystart) >> pdy;
@@ -1169,7 +1170,7 @@ int tcd_encode_tile_pxm(int tileno, unsigned char *dest, int len,info_image * in
 
 	//////???????????????????????
     offset_x = int_ceildiv(tcd_img->x0, tcd_img->comps[compno].dx);
-    offset_y = int_ceildiv(tcd_img->y0, tcd_img->comps[compno].dy);//计算分量采样
+    offset_y = int_ceildiv(tcd_img->y0, tcd_img->comps[compno].dy);//计算分量采样,(5.17)
 
     tw = tilec->x1 - tilec->x0;//分量的宽度
     w = int_ceildiv(tcd_img->x1 - tcd_img->x0, tcd_img->comps[compno].dx);//(真实图像的宽度/横向采样点)

@@ -875,7 +875,7 @@ void j2k_read_sot()
   }
 }
 
-/* 写入SOD标记及开始准备数据 */
+/* 写入SOD标记及开始准备处理数据 */
 void j2k_write_sod()
 {
   int l, layno;
@@ -1434,7 +1434,7 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
 
   FILE *f = NULL;
 
-  if (setjmp(j2k_error)) {//系统函数,输出错误
+  if (setjmp(j2k_error)) {//设置系统函数,输出错误
     return 0;
   }
 
@@ -1444,7 +1444,7 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
       fprintf(stderr, "failed to open %s for writing\n", output);
       return 1;
     }
-    dest = (char *) malloc(len);//为图像域申请空间
+    dest = (char *) malloc(len);//为图像域申请空间,(tile大小*tile总数*2)
     cio_init(dest, len);//设置首尾指针及当前指针
   }
 
@@ -1472,11 +1472,8 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
   }
   /* << INDEX */
 
-  //if (info_IM.index_on && !(cp->intermed_file))
-	//  get_info(&info_IM);
-
   j2k_state = J2K_STATE_MHSOC;//SOC码流开始 
-  j2k_write_soc();//写入SOC,码流开始标记
+  j2k_write_soc();//写入SOC,码流开始标记--->dest buffer
   j2k_state = J2K_STATE_MHSIZ;//SIZ标记,图像和拼接块大小
   j2k_write_siz();
   j2k_state = J2K_STATE_MH;
@@ -1529,7 +1526,6 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
   }
   /* << INDEX */
 
-
  for (tileno = 0; tileno < cp->tw * cp->th; tileno++) {
 	  //遍历tile
     fprintf(stderr, "Tile number %d / %d ", tileno + 1,cp->tw * cp->th);
@@ -1537,7 +1533,7 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,
     if (cp->intermed_file==1) {
       /* new dest for each tile  */
       free(dest);
-      dest = (char *) malloc(len);//重新申请图像域空间
+      dest = (char *) malloc(len);//重新申请图像域空间,(tile大小*tile总数*2)
       cio_init(dest, len);// 初始化dest
     }
 

@@ -74,7 +74,7 @@ typedef struct {
 typedef struct {
   int x0, y0;			/* XOsiz, YOsiz   真实图像原点 */
   int x1, y1;			/* Xsiz, Ysiz  网格大小  */
-  int numcomps;			/* number of components ,分量总数,在RGB当中有三个分量,分别为R,G,B,在灰度中只有高度分量     */
+  int numcomps;			/* number of components ,分量总数,在RGB当中有三个分量,分别为R,G,B,在灰度中只有亮度分量     */
   int color_space;		/* sRGB, Greyscale or YUV,色域 */
   j2k_comp_t *comps;		/* image-components          */
 } j2k_image_t;
@@ -87,15 +87,15 @@ typedef struct {
 
 typedef struct {
   int csty;			/* coding style                          */
-  int numresolutions;		/* number of resolutions                 */
-  int cblkw;			/* width of code-blocks                  */
+  int numresolutions;		/* number of resolutions ,分辨率层数        */
+  int cblkw;			/* width of code-blocks ,code-block的宽度 */
   int cblkh;			/* height of code-blocks                 */
   int cblksty;			/* code-block coding style               */
-  int qmfbid;			/* discrete wavelet transform identifier ,分享小波变换标识*/
-  int qntsty;			/* quantisation style                    */
-  j2k_stepsize_t stepsizes[J2K_MAXBANDS];	/* stepsizes used for quantization       */
+  int qmfbid;			/* discrete wavelet transform identifier ,分离小波变换标识*/
+  int qntsty;			/* quantisation style ,量化模式                   */
+  j2k_stepsize_t stepsizes[J2K_MAXBANDS];	/* stepsizes used for quantization ,量化步长      */
   int numgbits;			/* number of guard bits                  */
-  int roishift;			/* Region Of Interest shift              */
+  int roishift;			/* Region Of Interest shift ,是否对此tile 开启ROI             */
   int prcw[J2K_MAXRLVLS];	/* Precinct width                        */
   int prch[J2K_MAXRLVLS];	/* Precinct height                       */
 } j2k_tccp_t;/* tile component coding 参数*/
@@ -119,9 +119,11 @@ typedef struct {
   int POC;			/* Precise if a POC marker has been used O:NO, 1:YES                 */
   j2k_poc_t pocs[32];		/* progression order changes                                         */
   unsigned char *ppt_data;	/* packet header store there for futur use in t2_decode_packet       */
-  int ppt;			/* If ppt == 1 --> there was a PPT marker for the present tile       */
+
+  int ppt;			/* If ppt == 1 --> there was a PPT marker for the present tile ,打包包标头,拼接块部分,当采用PPM时不允许使用,当使用时,拼接块的所有包标头被重新定位到PPT      */
   int ppt_store;		/* Use in case of multiple marker PPT (number of info already store) */
   int ppt_len;			/* ppmbug1 */
+
   float distoratio[100];	/* add fixed_quality */
   j2k_tccp_t *tccps;		/* tile-component coding parameters                                  */
 } j2k_tcp_t;/* tile coding parameters ,切片分量*/

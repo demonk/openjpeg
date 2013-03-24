@@ -216,8 +216,8 @@ int floorlog2(int a)
 void encode_stepsize(int stepsize, int numbps, int *expn, int *mant)
 {
 	int p, n;
-	p = floorlog2(stepsize) - 13;
-	n = 11 - floorlog2(stepsize);
+	p = floorlog2(stepsize) - 13;//log2(stepsize)-13
+	n = 11 - floorlog2(stepsize);//11-log2(stepsize)
 	*mant = (n < 0 ? stepsize >> -n : stepsize << n) & 0x7ff;
 	*expn = numbps - p;
 }
@@ -225,7 +225,8 @@ void encode_stepsize(int stepsize, int numbps, int *expn, int *mant)
 void calc_explicit_stepsizes(j2k_tccp_t * tccp, int prec)
 {
 	int numbands, bandno;
-	numbands = 3 * tccp->numresolutions - 2;
+	numbands = 3 * tccp->numresolutions - 2;//子带数=3*分辨率层数-2
+
 	for (bandno = 0; bandno < numbands; bandno++) {
 		double stepsize;
 
@@ -243,7 +244,9 @@ void calc_explicit_stepsizes(j2k_tccp_t * tccp, int prec)
 			double norm = dwt_norms_97[orient][level];
 			stepsize = (1 << (gain + 1)) / norm;
 		}
-		encode_stepsize((int) floor(stepsize * 8192.0), prec + gain,
+		encode_stepsize(
+			(int) floor(stepsize * 8192.0),
+			prec + gain,
 			&tccp->stepsizes[bandno].expn,
 			&tccp->stepsizes[bandno].mant);
 	}
@@ -283,7 +286,7 @@ int main(int argc, char **argv)
 	char *index = 0;
 	char *s, S1, S2, S3;
 	int ir = 0;
-	int res_spec = 0;		/*   For various precinct sizes specification                 */
+	int res_spec = 0;		/*   For various precinct sizes specification ,//记录不同分区大小的数目，记录在prcw_init,必须是2的位数，支持多记录，第一个记录代表最高的分解层第二个代表次高的分解层，默认2^15*2^15每个分解                */
 	char sep;
 	char *outbuf, *out;
 	FILE *f;
@@ -304,7 +307,7 @@ int main(int argc, char **argv)
 	subsampling_dx = 1;
 	subsampling_dy = 1;
 	ROI_compno = -1;		/* no ROI */
-	ROI_shift = 0;
+	ROI_shift = 0;/* 是否开启ROI */
 	Dim[0] = 0;
 	Dim[1] = 0;
 	TX0 = 0;
@@ -497,7 +500,7 @@ int main(int argc, char **argv)
 			break;
 			/* ----------------------------------------------------- */
 		case 'c':			/* precinct dimension */
-			//范围大小，必须是2的位数，支持多记录，第一个记录代表最高的分解层第二个代表次高的分解层，默认2^15*2^15每个分解
+			//范围大小，记录在prcw_init,必须是2的位数，支持多记录，第一个记录代表最高的分解层第二个代表次高的分解层，默认2^15*2^15每个分解
 			{
 				s = optarg;
 				do {
@@ -606,7 +609,7 @@ int main(int argc, char **argv)
 			}
 			break;
 			/* ------------------------------------------------------ */
-		case 'E':			/* EPH marker */
+		case 'E':			/* EPH marker ,Encode packet header */
 			{
 				CSty |= 0x04;
 			}
@@ -633,7 +636,7 @@ int main(int argc, char **argv)
 			}
 			break;
 			/* ------------------------------------------------------ */
-		case 'T':			/* Tile offset */
+		case 'T':			/* Tile offset,即XTOSiz,YTOSiz */
 			{
 				if (sscanf(optarg, "%d,%d", &TX0, &TY0) != 2) {
 					fprintf(stderr, "-T 'tile offset' argument error !! [-T X0,Y0]");
@@ -661,7 +664,7 @@ int main(int argc, char **argv)
 			}
 			break;
 			/* ------------------------------------------------------ */
-		case 'F':			/* use intermed files*/
+		case 'F':			/* use intermed files,是否合并文件 */
 			{
 				cp.intermed_file=1;
 			}
@@ -713,7 +716,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	//what the fuck poc is????
+	//LRCP, RLCP, RPCL, PCRL, CPRL
 	//渐进顺序改变(POC标记段)
 	for (i = 0; i < numpocs; i++) {
 		if (POC[i].prg == -1) {
@@ -723,7 +726,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	//根据不同的输入文件后缀选择不同的方法提取图像数据
+	//根据不同的输入文件后缀选择不同的方法提取图像raw数据
 	switch (cp.image_type) {
 	case 0:
 		if (Tile_arg) {
@@ -761,14 +764,6 @@ int main(int argc, char **argv)
 	/* to respect profile - 0 */
 	/* ---------------------- */
 	numD_min = 0;
-	/*   while (int_ceildiv(img.x1,(1<<numD_min))-int_ceildiv(img.x0,(1<<numD_min))>120 || int_ceildiv(img.y1,(1<<numD_min))-int_ceildiv(img.y0,(1<<numD_min))>160) numD_min++;
-	if ((numD_min+1)>NumResolution)
-	{
-	fprintf(stderr,"\n********************************************************************************\n\n");
-	fprintf(stderr,  "In view to respect Profile-0, the number of resolution used is %d in place of %d\n\n",numD_min+1,NumResolution);
-	fprintf(stderr,  "********************************************************************************\n\n");
-	NumResolution=numD_min+1;
-	} */
 
 	if (Tile_arg == 1) {
 		cp.tw = int_ceildiv(img.x1 - cp.tx0, cp.tdx);//(图像的宽-切片原点X),结果是在宽上有多少个tile
@@ -779,7 +774,7 @@ int main(int argc, char **argv)
 	}
 
 	/* Initialization for PPM marker */
-	//???????????????????
+	//打包的包标头,主标头,可选 ,用于重新定位包标头,如果采用,则所有包的标头被重新定位到主标头中
 	cp.ppm = 0;
 	cp.ppm_data = NULL;
 	cp.ppm_previous = 0;
@@ -787,15 +782,14 @@ int main(int argc, char **argv)
 
 	/* Init the mutiple tiles */
 	/* ---------------------- */
-	cp.tcps = (j2k_tcp_t *) malloc(cp.tw * cp.th * sizeof(j2k_tcp_t));// 实际上是申请了一个分量片的数组
+	cp.tcps = (j2k_tcp_t *) malloc(cp.tw * cp.th * sizeof(j2k_tcp_t));// 实际上是申请了N个tile的数组
 
 	//分量片总数:cp.tw*cp.th
 	for (tileno = 0; tileno < cp.tw * cp.th; tileno++) {
 		//对每个分量片进行处理
 		tcp = &cp.tcps[tileno];
-		tcp->numlayers = tcp_init->numlayers;//取得质量层数
+		tcp->numlayers = tcp_init->numlayers;//取得质量层数,每输入一个
 
-		//what the fuck numlayers is !!????????
 		//对每个质量层进行质量赋值
 		for (j = 0; j < tcp->numlayers; j++) {
 			if (cp.fixed_quality)   // add fixed_quality
@@ -805,11 +799,10 @@ int main(int argc, char **argv)
 		}
 
 		tcp->csty = CSty;//设置编码风格
-		tcp->prg = Prog_order;
+		tcp->prg = Prog_order;//POC顺序
 		tcp->mct = img.numcomps == 3 ? 1 : 0;//如果是RGB(分量为3),则开启此多分量传输
 
-		//WHAT THE FUCK PPT IS??????
-		//PPT=Packed Packet headers,Tile-part header,拼接头部分
+		//PPT=Packed Packet headers,Tile-part header,拼接头部分,用于重定位所有包标头,与PPM互斥
 		tcp->ppt = 0;
 		tcp->ppt_data = NULL;
 		tcp->ppt_store = 0;
@@ -838,14 +831,13 @@ int main(int argc, char **argv)
 		tcp->numpocs = numpocs_tile;
 		////////////////////////////////////////
 
-		//
 		tcp->tccps = (j2k_tccp_t *) malloc(img.numcomps * sizeof(j2k_tccp_t));
 
 		for (i = 0; i < img.numcomps; i++) {
 			//遍历分量
 			tccp = &tcp->tccps[i];
 			tccp->csty = CSty & 0x01;	/* 0 => one precinct || 1 => custom precinct  */
-			tccp->numresolutions = NumResolution;//????what the fuck is resolution,分解???
+			tccp->numresolutions = NumResolution;//分辨率层数 
 			tccp->cblkw = int_floorlog2(cblockw_init);
 			tccp->cblkh = int_floorlog2(cblockh_init);//计算分割块二进制位数,如64即为6,即2的6次方为64
 			tccp->cblksty = mode;//????what the hell mode is?????
@@ -853,7 +845,7 @@ int main(int argc, char **argv)
 			tccp->qntsty = ir ? J2K_CCP_QNTSTY_SEQNT : J2K_CCP_QNTSTY_NOQNT;//量化模式
 			tccp->numgbits = 2;//????这又是个啥啊???
 			if (i == ROI_compno)
-				tccp->roishift = ROI_shift;//判断是否打开感 兴趣区域编码
+				tccp->roishift = ROI_shift;//判断是否打开感兴趣区域编码
 			else
 				tccp->roishift = 0;
 
@@ -863,7 +855,7 @@ int main(int argc, char **argv)
 				for (j = tccp->numresolutions - 1; j >= 0; j--) {
 					if (p < res_spec) {
 						if (prcw_init[p] < 1)
-							tccp->prcw[j] = 1;
+							tccp->prcw[j] = 1;//分区宽度 
 						else
 							tccp->prcw[j] = int_floorlog2(prcw_init[p]);
 
@@ -890,6 +882,7 @@ int main(int argc, char **argv)
 				}
 			} else {
 				for (j = 0; j < tccp->numresolutions; j++) {
+					//默认分区宽度  
 					tccp->prcw[j] = 15;
 					tccp->prch[j] = 15;
 				}
@@ -979,8 +972,8 @@ int main(int argc, char **argv)
 			/*For the moment, JP2 format does not use intermediary files for each tile*/
 			cp.intermed_file=0;
 		}
-		outbuf = (char *) malloc( cp.tdx * cp.tdy * cp.tw * cp.th * 10 *sizeof(char));//为图像域申请空间,那个10嘛......呃......
-		cio_init(outbuf, cp.tdx * cp.tdy * cp.tw * cp.th * 10); 
+		outbuf = (char *) malloc( cp.tdx * cp.tdy * cp.tw * cp.th * 10 *sizeof(char));//为图像域申请空间,处理完的结果就放在这里,那个10嘛......呃......
+		cio_init(outbuf, cp.tdx * cp.tdy * cp.tw * cp.th * 10); //同时设置好指针,以下的跳转都可以从这里拿到开始位置,结束位置和当前位置的指针 
 
 		/////////////////////////////////////////////////////
 		len = jp2_encode(jp2_struct, &cp, outbuf, index);

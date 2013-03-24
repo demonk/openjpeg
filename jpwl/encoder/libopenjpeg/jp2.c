@@ -495,7 +495,12 @@ int jp2_write_jp2c(j2k_image_t * img, j2k_cp_t * cp, char *jp2_buffer,char *inde
   else{
 	  //如果不容错
 				  //(图像,分量对象,输出文件名 ,图像域大小,码流索引文件)
-	len = j2k_encode(img, cp, jp2_buffer, cp->tdx * cp->tdy * cp->th * cp->tw * 2, index);//数据长度,单位byte
+	len = j2k_encode(
+		img, 
+		cp, 
+		jp2_buffer,
+		cp->tdx * cp->tdy * cp->th * cp->tw * 2, /* (tile大小*tile总数*2) */
+		index);//数据长度,单位byte
   }
 
 
@@ -592,9 +597,9 @@ int jp2_encode(jp2_struct_t * jp2_struct, j2k_cp_t * cp, char *output,char *inde
 {
   int len;
 
-  jp2_write_jp();/*　写入signature框 */
-  jp2_write_ftyp(jp2_struct);
-  jp2_write_jp2h(jp2_struct);
+  jp2_write_jp();/*　写入signature框到buffer */
+  jp2_write_ftyp(jp2_struct);/* 写入 FILE_TYPE框到buffer */
+  jp2_write_jp2h(jp2_struct);/* 写入JP2 HEADER框到buffer */
   len = jp2_write_jp2c(jp2_struct->image, cp, output, index);
 
   return cio_tell();
