@@ -902,7 +902,7 @@ void j2k_write_sod()
 
   tcp = &j2k_cp->tcps[j2k_curtileno];
   for (layno = 0; layno < tcp->numlayers; layno++) {
-	  //遍历质量层
+	  //遍历质量层,对每层质量层赋值
     tcp->rates[layno] = tcp->rates[layno]-(j2k_sod_start / (j2k_cp->th * j2k_cp->tw));
   }
 
