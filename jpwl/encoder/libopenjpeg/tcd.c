@@ -115,8 +115,8 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
   tcd_image.tiles = (tcd_tile_t *) malloc(sizeof(tcd_tile_t));
 
   for (tileno = 0; tileno < 1; tileno++) {
-    j2k_tcp_t *tcp = &cp->tcps[curtileno];//获取当前tile分量
-
+    j2k_tcp_t *tcp = &cp->tcps[curtileno];
+	//获取当前tile分量
     int j;
     /* cfr p59 ISO/IEC FDIS15444-1 : 2000 (18 august 2000) */
     int p = curtileno % cp->tw;	/* si numerotation matricielle .. */
@@ -147,8 +147,7 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
       } else {
 		if (!j && tcp->rates[j] < 30)//如果是第一层且第一层质量<30
 			tcp->rates[j] = 30;//第一层为30
-      }
-
+	  }
     }
 
     tile->comps =(tcd_tilecomp_t *) malloc(img->numcomps * sizeof(tcd_tilecomp_t));//针对不同分量上的同一位置的tile分量信息
@@ -168,14 +167,14 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 
       tilec->data =(int *) malloc((tilec->x1 - tilec->x0) * (tilec->y1 - tilec->y0) * sizeof(int));//对应分量tile在其对应采样率下的大小*sizeof(int)
 
-      tilec->numresolutions = tccp->numresolutions;//分辨率层数
+      tilec->numresolutions = tccp->numresolutions;//分辨率层数,默认6层
 
       tilec->resolutions =(tcd_resolution_t *) malloc(tilec->numresolutions * sizeof(tcd_resolution_t));
 
       for (resno = 0; resno < tilec->numresolutions; resno++) {
 		  //遍历分辨率
 		int pdx, pdy;//分区宽高
-		int levelno = tilec->numresolutions - 1 - resno;//当前分辨率层次,numresolutions,numresolutions-1,......,0
+		int levelno = tilec->numresolutions - 1 - resno;//当前分辨率层次b,从高频率成分开始 ,numresolutions,numresolutions-1,......,0
 
 		int tlprcxstart, tlprcystart, brprcxend, brprcyend;
 		int tlcbgxstart, tlcbgystart, brcbgxend, brcbgyend;
@@ -183,10 +182,10 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 		int cblkwidthexpn, cblkheightexpn;/* xcb',ycb' */
 	/* tcd_resolution_t *res=&tilec->resolutions[resno]; */
 
-		res = &tilec->resolutions[resno];//当前分辨率信息
+		res = &tilec->resolutions[resno];//当前分辨率信息对象引用 
 
 	/* border for each resolution level (global) */
-		//分辨率坐标计算（公式：5.25）
+		//分辨率坐标计算,只计算LL（公式：5.25）
 		res->x0 = int_ceildivpow2(tilec->x0, levelno);
 		res->y0 = int_ceildivpow2(tilec->y0, levelno);
 		res->x1 = int_ceildivpow2(tilec->x1, levelno);
@@ -210,17 +209,19 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 	brprcxend = int_ceildivpow2(res->x1, pdx) << pdx;//bottom right precinct cx start
 	brprcyend = int_ceildivpow2(res->y1, pdy) << pdy;//bottom right precinct cy start
 
+	//公式(5.27)
 	res->pw = (brprcxend - tlprcxstart) >> pdx;
 	res->ph = (brprcyend - tlprcystart) >> pdy;
 
 	//////////////////////////////////////////////////////////////////////////
-	//计算子带code block 大小(公式:5.28,5.29)
+	//计算code block 大小(公式:5.28,5.29)
 	if (resno == 0) {
 		//对第0层分辨率(最低频率成分)进行处理
-	  tlcbgxstart = tlprcxstart;//top left code block gx start
-	  tlcbgystart = tlprcystart;//top left code block gy start
-	  brcbgxend = brprcxend;//bottom right code block gx end
-	  brcbgyend = brprcyend;//bottom right code block gy end
+	  tlcbgxstart = tlprcxstart;//top left code block gx start=分区X起始
+	  tlcbgystart = tlprcystart;//top left code block gy start=分区Y起始
+	  brcbgxend = brprcxend;//bottom right code block gx end=分区X结束
+	  brcbgyend = brprcyend;//bottom right code block gy end=分区Y结束
+
 	  cbgwidthexpn = pdx;//code block g width expn=当前分辨率层次下的分区宽度
 	  cbgheightexpn = pdy;//code block g height expn=当前分辨率层次下的分区高度
 	} else {
@@ -228,21 +229,21 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 	  tlcbgystart = int_ceildivpow2(tlprcystart, 1);
 	  brcbgxend = int_ceildivpow2(brprcxend, 1);
 	  brcbgyend = int_ceildivpow2(brprcyend, 1);
+
 	  cbgwidthexpn = pdx - 1;//code block g width expn=当前分辨率层次下的分区宽度-1
 	  cbgheightexpn = pdy - 1;
 	}
-
+	//公式(5.28,5.29)
 	cblkwidthexpn = int_min(tccp->cblkw, cbgwidthexpn);
 	cblkheightexpn = int_min(tccp->cblkh, cbgheightexpn);
 	//////////////////////////////////////////////////////////////////////////
 
-	for (bandno = 0; bandno < res->numbands; bandno++) {
+		for (bandno = 0; bandno < res->numbands; bandno++) {//对于resno==0,则res->numbands=1
 		//遍历子带
-
 	  int x0b, y0b, i;
 	  int gain, numbps;
 	  j2k_stepsize_t *ss;
-	  band = &res->bands[bandno];// 从分辨率下获取到一个子带
+	  band = &res->bands[bandno];// 从当前分辨率下获取到一个子带对象的引用
 	  band->bandno = resno == 0 ? 0 : bandno + 1;//第0层分辨率子数
 
 	  x0b = (band->bandno == 1)|| (band->bandno == 3) ? 1 : 0;//对第一个及第三个子带给1
@@ -251,6 +252,7 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 	  if (band->bandno == 0) {
 		  //LL子带
 	    /* band border (global) */
+		  //当前分辨率坐标(公式5.25)
 	    band->x0 = int_ceildivpow2(tilec->x0, levelno);
 	    band->y0 = int_ceildivpow2(tilec->y0, levelno);
 	    band->x1 = int_ceildivpow2(tilec->x1, levelno);
@@ -262,34 +264,38 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 	    band->y0 =int_ceildivpow2(tilec->y0 - (1 << levelno) * y0b, levelno + 1);
 	    band->x1 =int_ceildivpow2(tilec->x1 - (1 << levelno) * x0b, levelno + 1);
 	    band->y1 =int_ceildivpow2(tilec->y1 - (1 << levelno) * y0b, levelno + 1);
-
 	  }
 
-	  ss = &tccp->stepsizes[resno ==0 ? 0 : 3 * (resno - 1) + bandno + 1];
+	  ss = &tccp->stepsizes[resno ==0 ? 0 : 3 * (resno - 1) + bandno + 1];//设置量化步长
 
-	  gain =tccp->qmfbid ==0 ? dwt_getgain_real(band->bandno) : dwt_getgain(band->bandno);
+	  gain =tccp->qmfbid ==0 ? dwt_getgain_real(band->bandno) : dwt_getgain(band->bandno);//?????????????????
 
 	  numbps = img->comps[compno].prec + gain;//BPS=当前分量精准度+可逆小波子带标识
 	  band->stepsize =(int) floor((1.0 + ss->mant / 2048.0) * pow(2.0, numbps - ss->expn) * 8192.0);
 	  band->numbps = ss->expn + tccp->numgbits - 1;	/* WHY -1 ? */
 
-	  band->precincts =(tcd_precinct_t *) malloc(3 * res->pw * res->ph * sizeof(tcd_precinct_t));
+	  band->precincts =(tcd_precinct_t *) malloc(3 * res->pw * res->ph * sizeof(tcd_precinct_t));//????????????????why time 3
 
 	  for (i = 0; i < res->pw * res->ph * 3; i++) {
 	    band->precincts[i].imsbtree = NULL;
 	    band->precincts[i].incltree = NULL;
 	  }
 
-	  for (precno = 0; precno < res->pw * res->ph; precno++) {
+		 for (precno = 0; precno < res->pw * res->ph; precno++) {
 		  //遍历分区 
+		  //cbgwidthexpn=PPX
+		  //cbgheightexpn=PPY
+		  //tlcbgxstart=xcb
+		  //tlcbgystart=ycb
 	    int tlcblkxstart, tlcblkystart, brcblkxend, brcblkyend;
+		//收下为codeblock坐标信息
 	    int cbgxstart = tlcbgxstart + (precno % res->pw) * (1 << cbgwidthexpn);
 	    int cbgystart = tlcbgystart + (precno / res->pw) * (1 << cbgheightexpn);
 	    int cbgxend = cbgxstart + (1 << cbgwidthexpn);
 	    int cbgyend = cbgystart + (1 << cbgheightexpn);
 	    /* tcd_precinct_t *prc=&band->precincts[precno]; */
 
-	    prc = &band->precincts[precno];//从当前子带中获取分区
+	    prc = &band->precincts[precno];//从当前子带中获取分区引用 
 
 	    /* precinct size (global) */
 	    prc->x0 = int_max(cbgxstart, band->x0);
@@ -297,10 +303,14 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 	    prc->x1 = int_min(cbgxend, band->x1);
 	    prc->y1 = int_min(cbgyend, band->y1);
 
+		/* 
+		cblkwidthexpn=xcb'
+		cblkheightexpn=ycb' */
 	    tlcblkxstart = int_floordivpow2(prc->x0, cblkwidthexpn) << cblkwidthexpn;
 	    tlcblkystart = int_floordivpow2(prc->y0, cblkheightexpn) << cblkheightexpn;
 	    brcblkxend = int_ceildivpow2(prc->x1, cblkwidthexpn) << cblkwidthexpn;
 	    brcblkyend = int_ceildivpow2(prc->y1, cblkheightexpn) << cblkheightexpn;
+
 	    prc->cw = (brcblkxend - tlcblkxstart) >> cblkwidthexpn;
 	    prc->ch = (brcblkyend - tlcblkystart) >> cblkheightexpn;
 
@@ -308,27 +318,234 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 	    prc->incltree = tgt_create(prc->cw, prc->ch);
 	    prc->imsbtree = tgt_create(prc->cw, prc->ch);
 
-	    for (cblkno = 0; cblkno < prc->cw * prc->ch; cblkno++) {
-	      int cblkxstart =
-		tlcblkxstart + (cblkno % prc->cw) * (1 << cblkwidthexpn);
-	      int cblkystart =
-		tlcblkystart + (cblkno / prc->cw) * (1 << cblkheightexpn);
+		   for (cblkno = 0; cblkno < prc->cw * prc->ch; cblkno++) {
+			//遍历codeblock
+	      int cblkxstart =tlcblkxstart + (cblkno % prc->cw) * (1 << cblkwidthexpn);
+	      int cblkystart =tlcblkystart + (cblkno / prc->cw) * (1 << cblkheightexpn);
 	      int cblkxend = cblkxstart + (1 << cblkwidthexpn);
 	      int cblkyend = cblkystart + (1 << cblkheightexpn);
 
 	      cblk = &prc->cblks[cblkno];
+
 	      /* code-block size (global) */
 	      cblk->x0 = int_max(cblkxstart, prc->x0);
 	      cblk->y0 = int_max(cblkystart, prc->y0);
 	      cblk->x1 = int_min(cblkxend, prc->x1);
 	      cblk->y1 = int_min(cblkyend, prc->y1);
-	    }
-	  }
-	}
-      }
-    }
-  }
-  /* tcd_dump(&tcd_image,curtileno); */
+		  }//codeblock for ends
+	  }//precinct for ends
+	}//band for ends
+   }//resolution for ends
+  }//components for ends
+ }//tile for ends
+}
+
+void tcd_init_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
+{
+	int tileno, compno, resno, bandno, precno, cblkno;
+
+	for (tileno = 0; tileno < 1; tileno++) {
+		//遍历tile
+		j2k_tcp_t *tcp = &cp->tcps[curtileno];//获取当前tile
+		int j;
+		//              int previous_x0, previous_x1, previous_y0, previous_y1;
+		/* cfr p59 ISO/IEC FDIS15444-1 : 2000 (18 august 2000) */
+		int p = curtileno % cp->tw;
+		int q = curtileno / cp->tw;//(q,p)=(行,列)
+		tile = tcd_image.tiles;//tile分量图像信息
+
+		/* 4 borders of the tile rescale on the image if necessary */
+		tile->x0 = int_max(cp->tx0 + p * cp->tdx, img->x0);//将tile的边框限制在图像起点或者图像域的起点(取大)
+		tile->y0 = int_max(cp->ty0 + q * cp->tdy, img->y0);
+		tile->x1 = int_min(cp->tx0 + (p + 1) * cp->tdx, img->x1);//将tile 的边框限制在图像的末点或者图像域的未点(取小)
+		tile->y1 = int_min(cp->ty0 + (q + 1) * cp->tdy, img->y1);
+
+		tile->numcomps = img->numcomps;//每个tile包含的分量数
+		/* tile->PPT=img->PPT; */
+
+		/* Modification of the RATE >> */
+		for (j = 0; j < tcp->numlayers; j++) {
+			//遍历质量层
+			tcp->rates[j] =int_ceildiv(
+				tile->numcomps * (tile->x1 - tile->x0) *(tile->y1 -tile->y0) * img->comps[0].prec,
+				(tcp->rates[j] * 8 * img->comps[0].dx * img->comps[0].dy)
+				);
+
+			if (j && tcp->rates[j] < tcp->rates[j - 1] + 10) {
+				tcp->rates[j] = tcp->rates[j - 1] + 20;
+			} else {
+				if (!j && tcp->rates[j] < 30)
+					tcp->rates[j] = 30;
+			}
+		}//rate over
+		/* << Modification of the RATE */
+
+		/* tile->comps=(tcd_tilecomp_t*)realloc(tile->comps,img->numcomps*sizeof(tcd_tilecomp_t)); */
+		for (compno = 0; compno < tile->numcomps; compno++) {
+			//遍历tile中的分量
+			j2k_tccp_t *tccp = &tcp->tccps[compno];
+			/* int realloc_op; */
+
+			tilec = &tile->comps[compno];//tile中的分量信息
+			/* border of each tile component (global) */
+			tilec->x0 = int_ceildiv(tile->x0, img->comps[compno].dx);
+			tilec->y0 = int_ceildiv(tile->y0, img->comps[compno].dy);
+			tilec->x1 = int_ceildiv(tile->x1, img->comps[compno].dx);
+			tilec->y1 = int_ceildiv(tile->y1, img->comps[compno].dy);
+
+			tilec->data =(int *) malloc((tilec->x1 - tilec->x0) * (tilec->y1 - tilec->y0) * sizeof(int));//为分量申请数据空间
+
+			tilec->numresolutions = tccp->numresolutions;//设置分辨率层数
+			/* tilec->resolutions=(tcd_resolution_t*)realloc(tilec->resolutions,tilec->numresolutions*sizeof(tcd_resolution_t)); */
+			for (resno = 0; resno < tilec->numresolutions; resno++) {
+				//遍历分辨率 
+				int pdx, pdy;
+				int levelno = tilec->numresolutions - 1 - resno;
+				int tlprcxstart, tlprcystart, brprcxend, brprcyend;
+				int tlcbgxstart, tlcbgystart, brcbgxend, brcbgyend;
+				int cbgwidthexpn, cbgheightexpn;
+				int cblkwidthexpn, cblkheightexpn;
+
+				res = &tilec->resolutions[resno];
+				/* border for each resolution level (global) */
+				res->x0 = int_ceildivpow2(tilec->x0, levelno);
+				res->y0 = int_ceildivpow2(tilec->y0, levelno);
+				res->x1 = int_ceildivpow2(tilec->x1, levelno);
+				res->y1 = int_ceildivpow2(tilec->y1, levelno);
+
+				res->numbands = resno == 0 ? 1 : 3;
+				/* p. 35, table A-23, ISO/IEC FDIS154444-1 : 2000 (18 august 2000) */
+				//??????????????????????????????????????
+				if (tccp->csty & J2K_CCP_CSTY_PRT) {
+					pdx = tccp->prcw[resno];
+					pdy = tccp->prch[resno];
+				} else {
+					pdx = 15;
+					pdy = 15;
+				}
+				/* p. 64, B.6, ISO/IEC FDIS15444-1 : 2000 (18 august 2000)  */
+				tlprcxstart = int_floordivpow2(res->x0, pdx) << pdx;
+				tlprcystart = int_floordivpow2(res->y0, pdy) << pdy;
+				brprcxend = int_ceildivpow2(res->x1, pdx) << pdx;
+				brprcyend = int_ceildivpow2(res->y1, pdy) << pdy;
+
+				res->pw = (brprcxend - tlprcxstart) >> pdx;
+				res->ph = (brprcyend - tlprcystart) >> pdy;
+
+				if (resno == 0) {
+					tlcbgxstart = tlprcxstart;
+					tlcbgystart = tlprcystart;
+					brcbgxend = brprcxend;
+					brcbgyend = brprcyend;
+					cbgwidthexpn = pdx;
+					cbgheightexpn = pdy;
+				} else {
+					tlcbgxstart = int_ceildivpow2(tlprcxstart, 1);
+					tlcbgystart = int_ceildivpow2(tlprcystart, 1);
+					brcbgxend = int_ceildivpow2(brprcxend, 1);
+					brcbgyend = int_ceildivpow2(brprcyend, 1);
+					cbgwidthexpn = pdx - 1;
+					cbgheightexpn = pdy - 1;
+				}
+
+				cblkwidthexpn = int_min(tccp->cblkw, cbgwidthexpn);
+				cblkheightexpn = int_min(tccp->cblkh, cbgheightexpn);
+
+				for (bandno = 0; bandno < res->numbands; bandno++) {
+					//遍历子带
+					int x0b, y0b;
+					int gain, numbps;
+					j2k_stepsize_t *ss;
+					band = &res->bands[bandno];
+					band->bandno = resno == 0 ? 0 : bandno + 1;
+					x0b = (band->bandno == 1) || (band->bandno == 3) ? 1 : 0;
+					y0b = (band->bandno == 2) || (band->bandno == 3) ? 1 : 0;
+
+					if (band->bandno == 0) {
+						/* band border */
+						band->x0 = int_ceildivpow2(tilec->x0, levelno);
+						band->y0 = int_ceildivpow2(tilec->y0, levelno);
+						band->x1 = int_ceildivpow2(tilec->x1, levelno);
+						band->y1 = int_ceildivpow2(tilec->y1, levelno);
+					} else {
+						band->x0 =
+							int_ceildivpow2(tilec->x0 -
+							(1 << levelno) * x0b, levelno + 1);
+						band->y0 =
+							int_ceildivpow2(tilec->y0 -
+							(1 << levelno) * y0b, levelno + 1);
+						band->x1 =
+							int_ceildivpow2(tilec->x1 -
+							(1 << levelno) * x0b, levelno + 1);
+						band->y1 =
+							int_ceildivpow2(tilec->y1 -
+							(1 << levelno) * y0b, levelno + 1);
+					}
+
+					ss = &tccp->stepsizes[resno ==0 ? 0 : 3 * (resno - 1) + bandno + 1];
+					gain =tccp->qmfbid ==0 ? dwt_getgain_real(band->bandno) : dwt_getgain(band->bandno);
+					numbps = img->comps[compno].prec + gain;
+					band->stepsize = (int) floor((1.0 + ss->mant / 2048.0) *pow(2.0, numbps - ss->expn) * 8192.0);
+					band->numbps = ss->expn + tccp->numgbits - 1;	/* WHY -1 ? */
+
+					for (precno = 0; precno < res->pw * res->ph; precno++) {
+						//遍历分区
+						int tlcblkxstart, tlcblkystart, brcblkxend, brcblkyend;
+						int cbgxstart =tlcbgxstart + (precno % res->pw) * (1 << cbgwidthexpn);
+						int cbgystart = tlcbgystart + (precno / res->pw) * (1 << cbgheightexpn);
+						int cbgxend = cbgxstart + (1 << cbgwidthexpn);
+						int cbgyend = cbgystart + (1 << cbgheightexpn);
+
+						prc = &band->precincts[precno];//从子带中获取分区
+						/* precinct size (global) */
+						prc->x0 = int_max(cbgxstart, band->x0);
+						prc->y0 = int_max(cbgystart, band->y0);
+						prc->x1 = int_min(cbgxend, band->x1);
+						prc->y1 = int_min(cbgyend, band->y1);
+
+						tlcblkxstart =int_floordivpow2(prc->x0, cblkwidthexpn) << cblkwidthexpn;
+						tlcblkystart = int_floordivpow2(prc->y0, cblkheightexpn) << cblkheightexpn;
+						brcblkxend = int_ceildivpow2(prc->x1, cblkwidthexpn) << cblkwidthexpn;
+						brcblkyend =int_ceildivpow2(prc->y1, cblkheightexpn) << cblkheightexpn;
+						prc->cw = (brcblkxend - tlcblkxstart) >> cblkwidthexpn;
+						prc->ch = (brcblkyend - tlcblkystart) >> cblkheightexpn;
+
+						free(prc->cblks);
+						prc->cblks =(tcd_cblk_t *) malloc(prc->cw * prc->ch * sizeof(tcd_cblk_t));//分区的code block信息
+
+						if (prc->incltree != NULL)
+							tgt_destroy(prc->incltree);
+						if (prc->imsbtree != NULL)
+							tgt_destroy(prc->imsbtree);
+
+						prc->incltree = tgt_create(prc->cw, prc->ch);//创建tag-tree
+						prc->imsbtree = tgt_create(prc->cw, prc->ch);
+
+						for (cblkno = 0; cblkno < prc->cw * prc->ch; cblkno++) {
+							//遍历codeblock
+							int cblkxstart =tlcblkxstart + (cblkno % prc->cw) * (1 << cblkwidthexpn);
+							int cblkystart =tlcblkystart + (cblkno / prc->cw) * (1 << cblkheightexpn);
+							int cblkxend = cblkxstart + (1 << cblkwidthexpn);
+							int cblkyend = cblkystart + (1 << cblkheightexpn);
+							cblk = &prc->cblks[cblkno];
+
+							/* code-block size (global) */
+							cblk->x0 = int_max(cblkxstart, prc->x0);
+							cblk->y0 = int_max(cblkystart, prc->y0);
+							cblk->x1 = int_min(cblkxend, prc->x1);
+							cblk->y1 = int_min(cblkyend, prc->y1);
+						}//codeblock for ends
+
+					}//precinct for ends
+
+				}//band for ends
+
+			}//resolution for ends
+
+		}//components for ends
+
+	}//tile for ends;
+	/* tcd_dump(&tcd_image,0); */
 }
 
 void tcd_free_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
@@ -364,208 +581,6 @@ void tcd_free_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
     free(tile->comps);
   }				/* for (tileno */
   free(tcd_image.tiles);
-}
-
-void tcd_init_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
-{
-  int tileno, compno, resno, bandno, precno, cblkno;
-
-  for (tileno = 0; tileno < 1; tileno++) {
-    j2k_tcp_t *tcp = &cp->tcps[curtileno];//获取当前tile
-    int j;
-    //              int previous_x0, previous_x1, previous_y0, previous_y1;
-    /* cfr p59 ISO/IEC FDIS15444-1 : 2000 (18 august 2000) */
-    int p = curtileno % cp->tw;
-    int q = curtileno / cp->tw;//(q,p)=(行,列)
-    tile = tcd_image.tiles;//tile分量图像信息
-
-    /* 4 borders of the tile rescale on the image if necessary */
-    tile->x0 = int_max(cp->tx0 + p * cp->tdx, img->x0);//将tile的边框限制在图像起点或者图像域的起点(取大)
-    tile->y0 = int_max(cp->ty0 + q * cp->tdy, img->y0);
-    tile->x1 = int_min(cp->tx0 + (p + 1) * cp->tdx, img->x1);//将tile 的边框限制在图像的末点或者图像域的未点(取小)
-    tile->y1 = int_min(cp->ty0 + (q + 1) * cp->tdy, img->y1);
-
-    tile->numcomps = img->numcomps;//每个tile包含的分量数
-    /* tile->PPT=img->PPT; */
-
-    /* Modification of the RATE >> */
-    for (j = 0; j < tcp->numlayers; j++) {
-		//遍历质量层
-      tcp->rates[j] =int_ceildiv(
-		  tile->numcomps * (tile->x1 - tile->x0) *(tile->y1 -tile->y0) * img->comps[0].prec,
-		  (tcp->rates[j] * 8 * img->comps[0].dx * img->comps[0].dy)
-		  );
-
-      if (j && tcp->rates[j] < tcp->rates[j - 1] + 10) {
-		tcp->rates[j] = tcp->rates[j - 1] + 20;
-      } else {
-		if (!j && tcp->rates[j] < 30)
-	  tcp->rates[j] = 30;
-      }
-    }//rate over
-    /* << Modification of the RATE */
-
-    /* tile->comps=(tcd_tilecomp_t*)realloc(tile->comps,img->numcomps*sizeof(tcd_tilecomp_t)); */
-    for (compno = 0; compno < tile->numcomps; compno++) {
-		//遍历tile中的分量
-      j2k_tccp_t *tccp = &tcp->tccps[compno];
-      /* int realloc_op; */
-
-      tilec = &tile->comps[compno];//tile中的分量信息
-      /* border of each tile component (global) */
-      tilec->x0 = int_ceildiv(tile->x0, img->comps[compno].dx);
-      tilec->y0 = int_ceildiv(tile->y0, img->comps[compno].dy);
-      tilec->x1 = int_ceildiv(tile->x1, img->comps[compno].dx);
-      tilec->y1 = int_ceildiv(tile->y1, img->comps[compno].dy);
-
-      tilec->data =(int *) malloc((tilec->x1 - tilec->x0) * (tilec->y1 - tilec->y0) * sizeof(int));//为分量申请数据空间
-
-      tilec->numresolutions = tccp->numresolutions;//设置分辨率层数
-      /* tilec->resolutions=(tcd_resolution_t*)realloc(tilec->resolutions,tilec->numresolutions*sizeof(tcd_resolution_t)); */
-      for (resno = 0; resno < tilec->numresolutions; resno++) {
-		  //遍历分辨率 
-		int pdx, pdy;
-		int levelno = tilec->numresolutions - 1 - resno;
-		int tlprcxstart, tlprcystart, brprcxend, brprcyend;
-		int tlcbgxstart, tlcbgystart, brcbgxend, brcbgyend;
-		int cbgwidthexpn, cbgheightexpn;
-		int cblkwidthexpn, cblkheightexpn;
-
-		res = &tilec->resolutions[resno];
-		/* border for each resolution level (global) */
-		res->x0 = int_ceildivpow2(tilec->x0, levelno);
-		res->y0 = int_ceildivpow2(tilec->y0, levelno);
-		res->x1 = int_ceildivpow2(tilec->x1, levelno);
-		res->y1 = int_ceildivpow2(tilec->y1, levelno);
-
-		res->numbands = resno == 0 ? 1 : 3;
-	/* p. 35, table A-23, ISO/IEC FDIS154444-1 : 2000 (18 august 2000) */
-		//??????????????????????????????????????
-		if (tccp->csty & J2K_CCP_CSTY_PRT) {
-		  pdx = tccp->prcw[resno];
-		  pdy = tccp->prch[resno];
-		} else {
-		  pdx = 15;
-		  pdy = 15;
-		}
-	/* p. 64, B.6, ISO/IEC FDIS15444-1 : 2000 (18 august 2000)  */
-		tlprcxstart = int_floordivpow2(res->x0, pdx) << pdx;
-		tlprcystart = int_floordivpow2(res->y0, pdy) << pdy;
-		brprcxend = int_ceildivpow2(res->x1, pdx) << pdx;
-		brprcyend = int_ceildivpow2(res->y1, pdy) << pdy;
-
-		res->pw = (brprcxend - tlprcxstart) >> pdx;
-		res->ph = (brprcyend - tlprcystart) >> pdy;
-
-		if (resno == 0) {
-		 tlcbgxstart = tlprcxstart;
-		 tlcbgystart = tlprcystart;
-		 brcbgxend = brprcxend;
-		 brcbgyend = brprcyend;
-		 cbgwidthexpn = pdx;
-		 cbgheightexpn = pdy;
-		} else {
-		  tlcbgxstart = int_ceildivpow2(tlprcxstart, 1);
-		  tlcbgystart = int_ceildivpow2(tlprcystart, 1);
-		  brcbgxend = int_ceildivpow2(brprcxend, 1);
-		  brcbgyend = int_ceildivpow2(brprcyend, 1);
-		  cbgwidthexpn = pdx - 1;
-		  cbgheightexpn = pdy - 1;
-		}
-
-		cblkwidthexpn = int_min(tccp->cblkw, cbgwidthexpn);
-		cblkheightexpn = int_min(tccp->cblkh, cbgheightexpn);
-
-		for (bandno = 0; bandno < res->numbands; bandno++) {
-			//遍历子带
-		  int x0b, y0b;
-		  int gain, numbps;
-		  j2k_stepsize_t *ss;
-		  band = &res->bands[bandno];
-		  band->bandno = resno == 0 ? 0 : bandno + 1;
-		 x0b = (band->bandno == 1) || (band->bandno == 3) ? 1 : 0;
-		y0b = (band->bandno == 2) || (band->bandno == 3) ? 1 : 0;
-
-	  if (band->bandno == 0) {
-	    /* band border */
-	    band->x0 = int_ceildivpow2(tilec->x0, levelno);
-	    band->y0 = int_ceildivpow2(tilec->y0, levelno);
-	    band->x1 = int_ceildivpow2(tilec->x1, levelno);
-	    band->y1 = int_ceildivpow2(tilec->y1, levelno);
-	  } else {
-	    band->x0 =
-	      int_ceildivpow2(tilec->x0 -
-			      (1 << levelno) * x0b, levelno + 1);
-	    band->y0 =
-	      int_ceildivpow2(tilec->y0 -
-			      (1 << levelno) * y0b, levelno + 1);
-	    band->x1 =
-	      int_ceildivpow2(tilec->x1 -
-			      (1 << levelno) * x0b, levelno + 1);
-	    band->y1 =
-	      int_ceildivpow2(tilec->y1 -
-			      (1 << levelno) * y0b, levelno + 1);
-	  }
-
-	  ss = &tccp->stepsizes[resno ==0 ? 0 : 3 * (resno - 1) + bandno + 1];
-	  gain =tccp->qmfbid ==0 ? dwt_getgain_real(band->bandno) : dwt_getgain(band->bandno);
-	  numbps = img->comps[compno].prec + gain;
-	  band->stepsize = (int) floor((1.0 + ss->mant / 2048.0) *pow(2.0, numbps - ss->expn) * 8192.0);
-	  band->numbps = ss->expn + tccp->numgbits - 1;	/* WHY -1 ? */
-
-	  for (precno = 0; precno < res->pw * res->ph; precno++) {
-		  //遍历分区
-	    int tlcblkxstart, tlcblkystart, brcblkxend, brcblkyend;
-	    int cbgxstart =tlcbgxstart + (precno % res->pw) * (1 << cbgwidthexpn);
-	    int cbgystart = tlcbgystart + (precno / res->pw) * (1 << cbgheightexpn);
-	    int cbgxend = cbgxstart + (1 << cbgwidthexpn);
-	    int cbgyend = cbgystart + (1 << cbgheightexpn);
-
-	    prc = &band->precincts[precno];//从子带中获取分区
-	    /* precinct size (global) */
-	    prc->x0 = int_max(cbgxstart, band->x0);
-	    prc->y0 = int_max(cbgystart, band->y0);
-	    prc->x1 = int_min(cbgxend, band->x1);
-	    prc->y1 = int_min(cbgyend, band->y1);
-
-	    tlcblkxstart =int_floordivpow2(prc->x0, cblkwidthexpn) << cblkwidthexpn;
-	    tlcblkystart = int_floordivpow2(prc->y0, cblkheightexpn) << cblkheightexpn;
-	    brcblkxend = int_ceildivpow2(prc->x1, cblkwidthexpn) << cblkwidthexpn;
-	    brcblkyend =int_ceildivpow2(prc->y1, cblkheightexpn) << cblkheightexpn;
-	    prc->cw = (brcblkxend - tlcblkxstart) >> cblkwidthexpn;
-	    prc->ch = (brcblkyend - tlcblkystart) >> cblkheightexpn;
-
-	    free(prc->cblks);
-	    prc->cblks =(tcd_cblk_t *) malloc(prc->cw * prc->ch * sizeof(tcd_cblk_t));//分区的code block信息
-
-	    if (prc->incltree != NULL)
-	      tgt_destroy(prc->incltree);
-	    if (prc->imsbtree != NULL)
-	      tgt_destroy(prc->imsbtree);
-
-	    prc->incltree = tgt_create(prc->cw, prc->ch);//创建tag-tree
-	    prc->imsbtree = tgt_create(prc->cw, prc->ch);
-
-	    for (cblkno = 0; cblkno < prc->cw * prc->ch; cblkno++) {
-	      int cblkxstart =tlcblkxstart + (cblkno % prc->cw) * (1 << cblkwidthexpn);
-	      int cblkystart =tlcblkystart + (cblkno / prc->cw) * (1 << cblkheightexpn);
-	      int cblkxend = cblkxstart + (1 << cblkwidthexpn);
-	      int cblkyend = cblkystart + (1 << cblkheightexpn);
-	      cblk = &prc->cblks[cblkno];
-
-	      /* code-block size (global) */
-	      cblk->x0 = int_max(cblkxstart, prc->x0);
-	      cblk->y0 = int_max(cblkystart, prc->y0);
-	      cblk->x1 = int_min(cblkxend, prc->x1);
-	      cblk->y1 = int_min(cblkyend, prc->y1);
-
-	    }
-	  }
-	}
-      }
-    }
-  }
-  /* tcd_dump(&tcd_image,0); */
 }
 
 void tcd_init(j2k_image_t * img, j2k_cp_t * cp)

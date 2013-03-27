@@ -77,7 +77,7 @@ typedef struct {
   tcd_cblk_t *cblks;		/* code-blocks informations */
   tgt_tree_t *incltree;		/* inclusion tree */
   tgt_tree_t *imsbtree;		/* IMSB tree */
-} tcd_precinct_t;
+} tcd_precinct_t;/* 分区信息 */
 
 typedef struct {
   int x0, y0, x1, y1;		/* dimension of the subband : left upper corner (x0, y0) right low corner (x1,y1) */
@@ -90,13 +90,13 @@ typedef struct {
 typedef struct {
   int x0, y0, x1, y1;		/* dimension of the resolution level : left upper corner (x0, y0) right low corner (x1,y1),分辨率维度 */
   int pw, ph;			/* precinct width/height ,分区尺寸宽,高 */
-  int numbands;			/* number sub-band for the resolution level,标记这是哪一个子带的 */
+  int numbands;			/* number sub-band for the resolution level,标记这是哪一个子带的,值取1或3 */
   tcd_band_t bands[3];		/* subband information ,子带信息*/
 } tcd_resolution_t;
 
 typedef struct {
   int x0, y0, x1, y1;		/* dimension of component : left upper corner (x0, y0) right low corner (x1,y1),分量维度参数  */
-  int numresolutions;		/* number of resolutions level ,分辨率层次*/
+  int numresolutions;		/* number of resolutions level ,分辨率层次,默认6层*/
   tcd_resolution_t *resolutions;	/* resolutions information ,分辨率信息*/
   int *data;			/* data of the component ,分量数据 */
   int nbpix;			/* add fixed_quality */
