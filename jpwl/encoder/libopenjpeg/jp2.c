@@ -503,7 +503,6 @@ int jp2_write_jp2c(j2k_image_t * img, j2k_cp_t * cp, char *jp2_buffer,char *inde
 		index);//数据长度,单位byte
   }
 
-
   box.length = cio_tell() - box.init_pos;
   cio_seek(box.init_pos);
   cio_write(box.length, 4);	/*    L       */
