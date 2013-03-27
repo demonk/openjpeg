@@ -125,8 +125,8 @@ typedef struct {
   int ppt_len;			/* ppmbug1 */
 
   float distoratio[100];	/* add fixed_quality */
-  j2k_tccp_t *tccps;		/* tile-component coding parameters                                  */
-} j2k_tcp_t;/* tile coding parameters ,切片分量*/
+  j2k_tccp_t *tccps;		/* tile-component coding parameters(细分到不同分量上的tile)                                  */
+} j2k_tcp_t;/* tile coding parameters ,切片分量(包含不同分量的),可理解为此定义仅为tile的一般性定义,具体的定义如尺寸大小等到j2k_tccp_t处定义 */
 
 typedef struct {
   int JPEG2000_format;		/* 0: J2K   1:JP2 */
@@ -191,7 +191,7 @@ typedef struct {
   int Main_head_end;		/* Main header position                                  */
   int codestream_size;		/* codestream's size                                     */
   info_tile *tile;		/* information concerning tiles inside image             */
-} info_image;			/* index struct  ,索引结构                                        */
+} info_image;			/* index struct  ,图像索引结构                                        */
 
 // index struct correction
 void pack_corr(unsigned long corr, int tileno);

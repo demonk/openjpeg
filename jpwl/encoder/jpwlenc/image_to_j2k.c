@@ -222,6 +222,7 @@ void encode_stepsize(int stepsize, int numbps, int *expn, int *mant)
 	*expn = numbps - p;
 }
 
+/* 计算子带量化步长  */
 void calc_explicit_stepsizes(j2k_tccp_t * tccp, int prec)
 {
 	int numbands, bandno;
@@ -254,8 +255,8 @@ void calc_explicit_stepsizes(j2k_tccp_t * tccp, int prec)
 
 int main(int argc, char **argv)
 {
-	
-    int len;
+
+	int len;
 	int NumResolution, numD_min;	/*   NumResolution : number of resolution                     */
 	int Tile_arg;			/*   Tile_arg = 0 (not in argument) ou = 1 (in argument)      */
 	int CSty;			/*   CSty : coding style                                      */
@@ -291,9 +292,7 @@ int main(int argc, char **argv)
 	char *outbuf, *out;
 	FILE *f;
 
-
 	/* default value */
-	/* ------------- */
 	NumResolution = 6;
 	CSty = 0;
 	cblockw_init = 64;
@@ -327,6 +326,7 @@ int main(int argc, char **argv)
 	cp.intermed_file=0;
 	use_index=0;
 
+	//分析参数
 	while (1) {
 		int c = getopt(argc, argv,
 			"i:o:r:q:f:t:n:c:b:x:p:s:d:h:P:S:E:M:R:T:C:I:W,F");//不断读取参数
@@ -679,7 +679,6 @@ int main(int argc, char **argv)
 	cp.ty0 = TY0;
 
 	// inserici i parametri jpwl
-
 	if(jpwl_cp.JPWL_on)
 		get_jpwl_cp(&cp);
 
@@ -697,7 +696,7 @@ int main(int argc, char **argv)
 		return 1;
 	} // mod fixed_quality
 
-
+	//初始化与参数验证
 	/* if no rate entered, lossless by default */
 	if (tcp_init->numlayers == 0) {
 		tcp_init->rates[tcp_init->numlayers] = 1;//lossless,对应-r 参数,对每一个质量层设定一个压缩率
@@ -759,36 +758,33 @@ int main(int argc, char **argv)
 		}
 		break;
 	}
-	
-	
+
 	/* to respect profile - 0 */
-	/* ---------------------- */
 	numD_min = 0;
 
+	//初始化拼接块数量或拼接块大小
 	if (Tile_arg == 1) {
-		cp.tw = int_ceildiv(img.x1 - cp.tx0, cp.tdx);//(图像的宽-切片原点X),结果是在宽上有多少个tile
-		cp.th = int_ceildiv(img.y1 - cp.ty0, cp.tdy);//(图像的高-切片原点Y),结果是在高上有多少个tile
+		cp.tw = int_ceildiv(img.x1 - cp.tx0, cp.tdx);//(图像的宽-切片原点X),结果是在宽上有多少个tile,向上取整
+		cp.th = int_ceildiv(img.y1 - cp.ty0, cp.tdy);//(图像的高-切片原点Y),结果是在高上有多少个tile,向上取整
 	} else {
 		cp.tdx = img.x1 - cp.tx0;//如果没设置切片大小,则切片为整个图像域(非图像,>=图像大小 )的大小 
 		cp.tdy = img.y1 - cp.ty0;
 	}
 
-	/* Initialization for PPM marker */
-	//打包的包标头,主标头,可选 ,用于重新定位包标头,如果采用,则所有包的标头被重新定位到主标头中
+	//初始化PPM包头,打包的包标头,主标头,可选 ,用于重新定位包标头,如果采用,则所有包的标头被重新定位到主标头中
 	cp.ppm = 0;
 	cp.ppm_data = NULL;
 	cp.ppm_previous = 0;
 	cp.ppm_store = 0;
 
 	/* Init the mutiple tiles */
-	/* ---------------------- */
 	cp.tcps = (j2k_tcp_t *) malloc(cp.tw * cp.th * sizeof(j2k_tcp_t));// 实际上是申请了N个tile的数组
 
 	//分量片总数:cp.tw*cp.th
 	for (tileno = 0; tileno < cp.tw * cp.th; tileno++) {
 		//对每个分量片进行处理
-		tcp = &cp.tcps[tileno];
-		tcp->numlayers = tcp_init->numlayers;//取得质量层数,每输入一个
+		tcp = &cp.tcps[tileno];//取得当前tile对象
+		tcp->numlayers = tcp_init->numlayers;//取得质量层数
 
 		//对每个质量层进行质量赋值
 		for (j = 0; j < tcp->numlayers; j++) {
@@ -797,7 +793,7 @@ int main(int argc, char **argv)
 			else
 				tcp->rates[j] = tcp_init->rates[j];
 		}
-
+		//对tile的POC,PPT等进行初始化
 		tcp->csty = CSty;//设置编码风格
 		tcp->prg = Prog_order;//POC顺序
 		tcp->mct = img.numcomps == 3 ? 1 : 0;//如果是RGB(分量为3),则开启此多分量传输
@@ -829,12 +825,10 @@ int main(int argc, char **argv)
 			}
 		}
 		tcp->numpocs = numpocs_tile;
-		////////////////////////////////////////
-
 		tcp->tccps = (j2k_tccp_t *) malloc(img.numcomps * sizeof(j2k_tccp_t));
 
 		for (i = 0; i < img.numcomps; i++) {
-			//遍历分量
+			//遍历同一位置但在不同分量上的tile,此处遍历所有的分量tile,可以理解为一个tile由N个分量块组成 
 			tccp = &tcp->tccps[i];
 			tccp->csty = CSty & 0x01;	/* 0 => one precinct || 1 => custom precinct  */
 			tccp->numresolutions = NumResolution;//分辨率层数 
@@ -889,7 +883,7 @@ int main(int argc, char **argv)
 			}
 			calc_explicit_stepsizes(tccp, img.comps[i].prec);
 		}
-	}
+	}//tiles for ends
 
 	if (cp.JPEG2000_format==0) {	      /* J2K format output */
 		if (cp.intermed_file==1) {	      /* After the encoding of each tile, j2k_encode 
@@ -955,6 +949,7 @@ int main(int argc, char **argv)
 	}
 	else			       /* JP2 format output */
 	{
+		//初始化JP2框架
 		jp2_struct_t * jp2_struct;
 		jp2_struct = (jp2_struct_t *) malloc(sizeof(jp2_struct_t));
 		jp2_struct->image = &img;
@@ -979,6 +974,7 @@ int main(int argc, char **argv)
 		len = jp2_encode(jp2_struct, &cp, outbuf, index);
 		////////////////////////////////////////////////////
 
+		//打开并写出文件
 		if (len == 0) {
 			fprintf(stderr, "failed to encode image\n");
 			return 1;
@@ -995,7 +991,6 @@ int main(int argc, char **argv)
 	}
 
 	/* Remove the temporary files */
-	/* -------------------------- */
 	if (cp.image_type) {		/* PNM PGM PPM */
 		for (i = 0; i < img.numcomps; i++) {
 			char tmp[7];										// risolto il bug finale (stack corrupted)!!!
