@@ -98,7 +98,7 @@ typedef struct {
   int roishift;			/* Region Of Interest shift ,是否对此tile 开启ROI             */
   int prcw[J2K_MAXRLVLS];	/* Precinct width                        */
   int prch[J2K_MAXRLVLS];	/* Precinct height                       */
-} j2k_tccp_t;/* tile component coding 参数*/
+} j2k_tccp_t;/* Tile-component coding parameters.*/
 
 typedef struct {
   int resno0, compno0;
@@ -126,7 +126,9 @@ typedef struct {
 
   float distoratio[100];	/* add fixed_quality */
   j2k_tccp_t *tccps;		/* tile-component coding parameters(细分到不同分量上的tile)                                  */
-} j2k_tcp_t;/* tile coding parameters ,切片分量(包含不同分量的),可理解为此定义仅为tile的一般性定义,具体的定义如尺寸大小等到j2k_tccp_t处定义 */
+} j2k_tcp_t;/* tile coding parameters ,
+			用来存放编码和解码通用参数给所有的tiles
+			切片分量(包含不同分量的),可理解为此定义仅为tile的一般性定义,具体的定义如尺寸大小等到j2k_tccp_t处定义 */
 
 typedef struct {
   int JPEG2000_format;		/* 0: J2K   1:JP2 */
@@ -155,7 +157,7 @@ typedef struct {
 
   j2k_tcp_t *tcps;		/* tile coding parameters                                                  */
   int *matrice;			/* Fixed layer                                                             */
-} j2k_cp_t;//component,/* coding parameters ,可以看作分量 */
+} j2k_cp_t;/* coding parameters ,可以看作分量 */
 
 typedef struct {
   int start_pos, end_pos;	/* start and end position            */

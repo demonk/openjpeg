@@ -696,7 +696,7 @@ int main(int argc, char **argv)
 		return 1;
 	} // mod fixed_quality
 
-	//初始化与参数验证
+	//初始化通用tile参数与参数验证
 	/* if no rate entered, lossless by default */
 	if (tcp_init->numlayers == 0) {
 		tcp_init->rates[tcp_init->numlayers] = 1;//lossless,对应-r 参数,对每一个质量层设定一个压缩率

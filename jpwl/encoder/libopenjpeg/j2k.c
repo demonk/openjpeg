@@ -885,7 +885,8 @@ void j2k_write_sod()
 
 	cio_write(J2K_MS_SOD, 2);//写入SOD码流标记 
 
-	if (j2k_curtileno == 0) {//如果是第一个tile
+	if (j2k_curtileno == 0) {
+		//如果是第一个tile
 		j2k_sod_start = cio_tell() + pos_correction;//记录SOD开始的位置
 	}
 
@@ -1526,7 +1527,6 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,int len
 		}
 		j2k_curtileno = tileno;//当前分量number
 		/* initialisation before tile encoding  */
-
 		//划分tile及其下分辨率,子带,分区,codeblock等
 		if (tileno == 0) {// (raw image,coding parameter,标识当前的tile)
 			tcd_malloc_encode(j2k_img, j2k_cp, j2k_curtileno);//如果是第一个tile就重新分配 ,初始化tile coder
@@ -1710,9 +1710,7 @@ tile:
 		/* closing file *.j2k */
 		fclose(f);
 	}
-
 	/* Creation of the index file     */
-
 	if ((info_IM.index_on && use_index && cp->intermed_file) || (info_IM.index_on && use_index &&!(jpwl_cp.JPWL_on))){
 		cod_len = cio_tell() + pos_correction;
 		printf("num: %d\n",info_IM.num);
