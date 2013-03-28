@@ -114,7 +114,7 @@ typedef struct {
 typedef struct {
   int tw, th;			/* number of tiles in width and heigth */
   tcd_tile_t *tiles;		/* Tiles information */
-} tcd_image_t;/* tile分量图像 */
+} tcd_image_t;/* tile整体信息,tw,th为标记tile数量,tcd_tile_t分别定义tile的信息 */
 
 /*
  * Initialize the tile coder (reuses the memory allocated by tcd_malloc_encode)

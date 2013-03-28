@@ -376,6 +376,7 @@ void j2k_read_cox(int compno)
 	tccp->cblkh = cio_read(1) + 2;	/* SPcox (F) */
 	tccp->cblksty = cio_read(1);	/* SPcox (G) */
 	tccp->qmfbid = cio_read(1);	/* SPcox (H) */
+
 	if (tccp->csty & J2K_CP_CSTY_PRT) {
 		for (i = 0; i < tccp->numresolutions; i++) {
 			int tmp = cio_read(1);	/* SPcox (I_i) */

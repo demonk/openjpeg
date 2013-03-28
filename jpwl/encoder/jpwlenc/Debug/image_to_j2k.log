@@ -1,179 +1,66 @@
-﻿Build started 3/28/2013 00:35:37.
-     1>Project "E:\task\JPEG2000\Projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.vcxproj" on node 2 (build target(s)).
+﻿Build started 2013/3/28  18:58:45.
+     1>Project "E:\JPEG2000\useful\Projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
-         Creating ".\Debug\image_to_j2k.unsuccessfulbuild" because "AlwaysCreate" was specified.
+         Touching ".\Debug\image_to_j2k.unsuccessfulbuild".
        ClCompile:
-         D:\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I../libopenjpeg /ZI /nologo /W3 /WX- /Od /Oy- /D _DEBUG /D DONT_HAVE_GETOPT /D WIN32 /D _CONSOLE /D _MBCS /Gm- /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\Debug/" /Fd".\Debug/vc100.pdb" /FR".\Debug\\" /Gd /TC /analyze- /errorReport:prompt ..\libopenjpeg\dwt.c ..\libopenjpeg\j2k.c ..\libopenjpeg\jp2.c ..\libopenjpeg\jpt.c ..\libopenjpeg\jpw.c ..\libopenjpeg\pi.c ..\libopenjpeg\t1.c ..\libopenjpeg\t2.c ..\libopenjpeg\tcd.c convert.c image_to_j2k.c
-         dwt.c
-         j2k.c
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\j2k.c(319): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(371) : see declaration of 'sprintf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\j2k.c(1014): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\j2k.c(1428): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\j2k.c(1658): warning C4018: '<' : signed/unsigned mismatch
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\j2k.c(1697): warning C4102: 'tile' : unreferenced label
-         jp2.c
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\jp2.c(150): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(371) : see declaration of 'sprintf'
-         jpt.c
-         jpw.c
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\jpw.c(1777): warning C4018: '<' : signed/unsigned mismatch
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\jpw.c(1827): warning C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(304) : see declaration of 'scanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\jpw.c(1855): warning C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(304) : see declaration of 'scanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\jpw.c(2069): warning C4133: '=' : incompatible types - from 'double *' to 'long *'
-         pi.c
-         t1.c
-         t2.c
+         D:\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I../libopenjpeg /ZI /nologo /W3 /WX- /Od /Oy- /D _DEBUG /D DONT_HAVE_GETOPT /D WIN32 /D _CONSOLE /D _MBCS /Gm- /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\Debug/" /Fd".\Debug/vc100.pdb" /FR".\Debug\\" /Gd /TC /analyze- /errorReport:prompt ..\libopenjpeg\tcd.c image_to_j2k.c
          tcd.c
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1177): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1181): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(371) : see declaration of 'sprintf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1178): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1182): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1337): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1341): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(371) : see declaration of 'sprintf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1338): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1342): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1347): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1351): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1353): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1357): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1357): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1361): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1364): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\libopenjpeg\tcd.c(1368): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-         convert.c
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(87): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(200): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(205): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(210): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(303): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(327): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(332): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(337): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(399): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(415): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(420): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(425): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(568): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(371) : see declaration of 'sprintf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(569): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(574): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(610): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(371) : see declaration of 'sprintf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(611): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(620): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(371) : see declaration of 'sprintf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(621): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(678): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(694): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(696): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(699): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(723): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(730): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(738): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(740): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(743): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(766): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(781): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(783): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(786): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(810): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(816): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(822): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(830): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(831): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(832): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(844): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(846): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(849): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(253) : see declaration of 'fscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(873): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(879): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\convert.c(885): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
          image_to_j2k.c
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(417): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(424): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(436): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(443): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(454): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(461): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(464): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(471): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(474): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(481): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(492): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(499): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(499): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(506): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(509): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(516): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(520): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(527): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(558): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(565): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(569): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(576): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(593): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(601): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(620): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(637): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(632): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(649): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(641): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(658): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(325) : see declaration of 'sscanf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(919): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(941): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(934): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(956): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(982): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(1005): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(997): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(1020): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(371) : see declaration of 'sprintf'
-     1>e:\task\jpeg2000\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(1005): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>e:\jpeg2000\useful\projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.c(1028): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\microsoft visual studio 10.0\vc\include\stdio.h(371) : see declaration of 'sprintf'
          Generating Code...
        ManifestResourceCompile:
@@ -206,14 +93,14 @@
          All outputs are up-to-date.
        LinkEmbedManifest:
          All outputs are up-to-date.
-         image_to_j2k.vcxproj -> E:\task\JPEG2000\Projects\openjpeg\jpwl\encoder\jpwlenc\.\Debug\image_to_j2k.exe
+         image_to_j2k.vcxproj -> E:\JPEG2000\useful\Projects\openjpeg\jpwl\encoder\jpwlenc\.\Debug\image_to_j2k.exe
        BscMake:
          D:\Microsoft Visual Studio 10.0\VC\bin\bscmake.exe /nologo /o".\Debug\image_to_j2k.bsc" .\Debug\bio.sbr .\Debug\cio.sbr .\Debug\convert.sbr .\Debug\dwt.sbr .\Debug\fix.sbr .\Debug\getopt.sbr .\Debug\image_to_j2k.sbr .\Debug\int.sbr .\Debug\j2k.sbr .\Debug\jp2.sbr .\Debug\jpt.sbr .\Debug\jpw.sbr .\Debug\mct.sbr .\Debug\mqc.sbr .\Debug\pi.sbr .\Debug\raw.sbr .\Debug\rs.sbr .\Debug\t1.sbr .\Debug\t2.sbr .\Debug\tcd.sbr .\Debug\tgt.sbr
        FinalizeBuildStatus:
          Deleting file ".\Debug\image_to_j2k.unsuccessfulbuild".
          Touching ".\Debug\image_to_j2k.lastbuildstate".
-     1>Done Building Project "E:\task\JPEG2000\Projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.vcxproj" (build target(s)).
+     1>Done Building Project "E:\JPEG2000\useful\Projects\openjpeg\jpwl\encoder\jpwlenc\image_to_j2k.vcxproj" (build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:04.85
+Time Elapsed 00:00:10.71

@@ -44,10 +44,16 @@
 #define J2K_MAXRLVLS 33		/* Number of maximum resolution level authorized                   */
 #define J2K_MAXBANDS (3*J2K_MAXRLVLS-2)	/* Number of maximum sub-band linked to number of resolution level */
 
-#define J2K_CP_CSTY_PRT 0x01
-#define J2K_CP_CSTY_SOP 0x02
-#define J2K_CP_CSTY_EPH 0x04
+#define J2K_CP_CSTY_PRT 0x01 /* 0 => one precinct || 1 => custom precinct  */
+#define J2K_CP_CSTY_SOP 0x02 /* This option offers the possibility to add a specific marker before each packet.
+								It is the marker SOP (Start of packet). 
+								If the option is not used no SOP marker will be added. */
+#define J2K_CP_CSTY_EPH 0x04 /* This option offers the possibility to add a specific marker at the head of each packet header. 
+								It is the marker EPH (End of packet Header). 
+								If the option is not used no EPH marker will be added. */
+
 #define J2K_CCP_CSTY_PRT 0x01
+
 #define J2K_CCP_CBLKSTY_LAZY 0x01
 #define J2K_CCP_CBLKSTY_RESET 0x02
 #define J2K_CCP_CBLKSTY_TERMALL 0x04
@@ -101,11 +107,12 @@ typedef struct {
 } j2k_tccp_t;/* Tile-component coding parameters.*/
 
 typedef struct {
-  int resno0, compno0;
-  int layno1, resno1, compno1;
-  int prg;
+  int resno0;/* Rresolution num start */
+  int compno0;/* Component num start */
+  int layno1, resno1, compno1;/* Layer num end,Resolution num end,Component num end */
+  int prg;/* 由progrorder[4]计算出的整形标识,-1为错误,0~4为其中的五种可能 */
   int tile;
-  char progorder[4];
+  char progorder[4];/* POC顺序 */
 } j2k_poc_t;
 
 typedef struct {
@@ -136,7 +143,7 @@ typedef struct {
   int image_type;		/* 0: PNM, PGM, PPM 1: PGX           */
   int disto_alloc;		/* Allocation by rate/distortion     */
   int fixed_alloc;		/* Allocation by fixed layer         */
-  int fixed_quality;		/* add fixed_quality */
+  int fixed_quality;		/* add fixed_quality,PSNR值 */
   int reduce_on;		/* option reduce is used if reduce = 1 */
   int reduce_value;		/* if option reduce is used -> original dimension divided by 2^value */
   int index_on;			/* 0 = no index || 1 = index */

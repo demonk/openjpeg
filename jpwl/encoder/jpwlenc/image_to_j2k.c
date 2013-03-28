@@ -167,26 +167,32 @@ void help_display()
 	printf("Tpacket_M  ''    ''   ''   ''    ''       ''       ''\n");
 }
 
+/*由progression计算出的0~4的顺序值标识 */
 int give_progression(char progression[4])
 {
 	if (progression[0] == 'L' && progression[1] == 'R'
 		&& progression[2] == 'C' && progression[3] == 'P') {
+			//LRCP
 			return 0;
 	} else {
 		if (progression[0] == 'R' && progression[1] == 'L'
 			&& progression[2] == 'C' && progression[3] == 'P') {
+				//RLCP
 				return 1;
 		} else {
 			if (progression[0] == 'R' && progression[1] == 'P'
 				&& progression[2] == 'C' && progression[3] == 'L') {
+					//RPCL
 					return 2;
 			} else {
 				if (progression[0] == 'P' && progression[1] == 'C'
 					&& progression[2] == 'R' && progression[3] == 'L') {
+						//PCRL
 						return 3;
 				} else {
 					if (progression[0] == 'C' && progression[1] == 'P'
 						&& progression[2] == 'R' && progression[3] == 'L') {
+							//CPRL
 							return 4;
 					} else {
 						return -1;
@@ -231,14 +237,15 @@ void calc_explicit_stepsizes(j2k_tccp_t * tccp, int prec)
 	for (bandno = 0; bandno < numbands; bandno++) {
 		double stepsize;
 
-		int resno, level, orient, gain;
+		int resno;
+		int level;
+		int orient;/* 0:LL,1:HL,2:LH,3:HH */
+		int gain;
+
 		resno = bandno == 0 ? 0 : (bandno - 1) / 3 + 1;
 		orient = bandno == 0 ? 0 : (bandno - 1) % 3 + 1;
 		level = tccp->numresolutions - 1 - resno;
-		gain =
-			tccp->qmfbid == 0 ? 0 : (orient ==
-			0 ? 0 : (orient == 1
-			|| orient == 2 ? 1 : 2));
+		gain =tccp->qmfbid == 0 ? 0 : (orient ==0 ? 0 : (orient == 1|| orient == 2 ? 1 : 2));
 		if (tccp->qntsty == J2K_CCP_QNTSTY_NOQNT) {
 			stepsize = 1.0;
 		} else {
@@ -585,7 +592,8 @@ int main(int argc, char **argv)
 			{	fprintf(stderr, "/----------------------------------\\\n");
 			fprintf(stderr, "|  POC option not fully tested !!  |\n");
 			fprintf(stderr, "\\----------------------------------/\n");
-
+			//参数:-POC Ttile num = Resolution num start, Component num start, Layer num end, Resolution num end, Component num end, Progression order 
+			//Example:-POC T1=0,0,1,5,3,CPRL/T1=5,0,1,6,3,CPRL
 			s = optarg;
 			while (sscanf(s, "T%d=%d,%d,%d,%d,%d,%s", &POC[numpocs].tile,
 				&POC[numpocs].resno0, &POC[numpocs].compno0,
@@ -615,7 +623,16 @@ int main(int argc, char **argv)
 			}
 			break;
 			/* ------------------------------------------------------ */
-		case 'M':			/* Mode switch pas tous au point !! */
+		case 'M':			/* Mode switch pas tous au point !! 模式变化 */
+			/*
+			BYPASS(LAZY) [1]:选择MQ编码器过程 
+			RESET [2]:复位环境状态
+			RESTART(TERMALL) [4]:终止和重启动MQ编码器
+			VSC [8]:CAUSAL,条带原因环境信息
+			ERTERM(SEGTERM) [16]:可预测终止
+			SEGMARK(SEGSYM)] [32]:段标记
+			*/
+			/* 其中 mode=以上参数的组合和*/
 			{
 				if (sscanf(optarg, "%d", &value) == 1) {
 					for (i = 0; i <= 5; i++) {
@@ -725,7 +742,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	//根据不同的输入文件后缀选择不同的方法提取图像raw数据
+	//根据不同的输入文件后缀选择不同的方法提取图像raw数据(此处为img赋值)
 	switch (cp.image_type) {
 	case 0:
 		if (Tile_arg) {
@@ -780,13 +797,12 @@ int main(int argc, char **argv)
 	/* Init the mutiple tiles */
 	cp.tcps = (j2k_tcp_t *) malloc(cp.tw * cp.th * sizeof(j2k_tcp_t));// 实际上是申请了N个tile的数组
 
-	//分量片总数:cp.tw*cp.th
+	//分量片总数:cp.tw*cp.th,//对每个分量片进行处理
 	for (tileno = 0; tileno < cp.tw * cp.th; tileno++) {
-		//对每个分量片进行处理
 		tcp = &cp.tcps[tileno];//取得当前tile对象
 		tcp->numlayers = tcp_init->numlayers;//取得质量层数
 
-		//对每个质量层进行质量赋值
+		//对每个质量层进行质量赋值(PSNR)
 		for (j = 0; j < tcp->numlayers; j++) {
 			if (cp.fixed_quality)   // add fixed_quality
 				tcp->distoratio[j] = tcp_init->distoratio[j];
@@ -803,11 +819,12 @@ int main(int argc, char **argv)
 		tcp->ppt_data = NULL;
 		tcp->ppt_store = 0;
 
-		//what the fuck poc is???????=====>>Progression Order Change,渐进顺序改变,是码流主标头的标记段
-		numpocs_tile = 0;
+		//统计POC数目及对其初始化
+		numpocs_tile = 0;//统计POC
+		//Progression Order Change,渐进顺序改变,是码流主标头的标记段
 		tcp->POC = 0;
 		if (numpocs) {
-			/* intialisation of POC */
+			//如果有设置POC则设置初始化
 			tcp->POC = 1;
 			//初始化拼接头属性
 			for (i = 0; i < numpocs; i++) {
@@ -818,7 +835,7 @@ int main(int argc, char **argv)
 					tcp_poc->layno1 = POC[numpocs_tile].layno1;
 					tcp_poc->resno1 = POC[numpocs_tile].resno1;
 					tcp_poc->compno1 = POC[numpocs_tile].compno1;
-					tcp_poc->prg = POC[numpocs_tile].prg;
+					tcp_poc->prg = POC[numpocs_tile].prg;//顺序标识值
 					tcp_poc->tile = POC[numpocs_tile].tile;
 					numpocs_tile++;
 				}
@@ -827,14 +844,19 @@ int main(int argc, char **argv)
 		tcp->numpocs = numpocs_tile;
 		tcp->tccps = (j2k_tccp_t *) malloc(img.numcomps * sizeof(j2k_tccp_t));
 
+		//初始化tccp
 		for (i = 0; i < img.numcomps; i++) {
-			//遍历同一位置但在不同分量上的tile,此处遍历所有的分量tile,可以理解为一个tile由N个分量块组成 
-			tccp = &tcp->tccps[i];
+			//遍历同一位置但在不同分量上的tile,此处遍历所有的分量tile,可理解为一个tcp->tccps由N个tccp链表组成
+			tccp = &tcp->tccps[i];//取得一个tccp对象引用 
+			
+			//对tccp进行初始化
 			tccp->csty = CSty & 0x01;	/* 0 => one precinct || 1 => custom precinct  */
 			tccp->numresolutions = NumResolution;//分辨率层数 
+
 			tccp->cblkw = int_floorlog2(cblockw_init);
 			tccp->cblkh = int_floorlog2(cblockh_init);//计算分割块二进制位数,如64即为6,即2的6次方为64
-			tccp->cblksty = mode;//????what the hell mode is?????
+
+			tccp->cblksty = mode;//模式变化开关
 			tccp->qmfbid = ir ? 0 : 1;//设定是否可逆//???可逆个啥啊????可逆个小波啊!!小波可逆个啥啊???
 			tccp->qntsty = ir ? J2K_CCP_QNTSTY_SEQNT : J2K_CCP_QNTSTY_NOQNT;//量化模式
 			tccp->numgbits = 2;//????这又是个啥啊???
@@ -843,7 +865,7 @@ int main(int argc, char **argv)
 			else
 				tccp->roishift = 0;
 
-			//??????????????????????????????
+			//设置tile on Component 分区默认宽度
 			if (CSty & J2K_CCP_CSTY_PRT) {//这一天天的模式是神马意思啊!!!!
 				int p = 0;
 				for (j = tccp->numresolutions - 1; j >= 0; j--) {
@@ -967,6 +989,7 @@ int main(int argc, char **argv)
 			/*For the moment, JP2 format does not use intermediary files for each tile*/
 			cp.intermed_file=0;
 		}
+
 		outbuf = (char *) malloc( cp.tdx * cp.tdy * cp.tw * cp.th * 10 *sizeof(char));//为图像域申请空间,处理完的结果就放在这里,那个10嘛......呃......
 		cio_init(outbuf, cp.tdx * cp.tdy * cp.tw * cp.th * 10); //同时设置好指针,以下的跳转都可以从这里拿到开始位置,结束位置和当前位置的指针 
 

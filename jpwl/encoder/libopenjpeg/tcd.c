@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static tcd_image_t tcd_image;
+static tcd_image_t tcd_image;//
 
 static j2k_image_t *tcd_img;/* 当前分量图像,在tcd_malloc_encode中定义 */
 static j2k_cp_t *tcd_cp;/*  当前tile分量 */
@@ -112,7 +112,7 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 	tcd_cp = cp;
 	tcd_image.tw = cp->tw;
 	tcd_image.th = cp->th;
-	tcd_image.tiles = (tcd_tile_t *) malloc(sizeof(tcd_tile_t));//为此image申请一个tile的空间
+	tcd_image.tiles = (tcd_tile_t *) malloc(sizeof(tcd_tile_t));//tile信息
 
 	for (tileno = 0; tileno < 1; tileno++) {
 		//其实只遍历一次
@@ -170,8 +170,11 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 			tilec->numresolutions = tccp->numresolutions;//分辨率层数
 
 			tilec->resolutions =(tcd_resolution_t *) malloc(tilec->numresolutions * sizeof(tcd_resolution_t));
+
+
+		
 			for (resno = 0; resno < tilec->numresolutions; resno++) {
-				//遍历分辨率
+				//遍历划分分辨率
 				int pdx, pdy;//分区宽高
 				int levelno = tilec->numresolutions - 1 - resno;//当前分辨率层次,numresolutions,numresolutions-1,......,0
 
@@ -233,10 +236,12 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 				cblkwidthexpn = int_min(tccp->cblkw, cbgwidthexpn);
 				cblkheightexpn = int_min(tccp->cblkh, cbgheightexpn);
 				//////////////////////////////////////////////////////////////////////////
+
 				for (bandno = 0; bandno < res->numbands; bandno++) {
-					//遍历子带
+					//遍历划分子带
 					int x0b, y0b, i;
-					int gain, numbps;
+					int gain;/* 基于变换编码的压缩特性提高效果尺度 */
+					int numbps;
 					j2k_stepsize_t *ss;
 					band = &res->bands[bandno];// 从分辨率下获取到一个子带
 					band->bandno = resno == 0 ? 0 : bandno + 1;//第0层分辨率子数
@@ -258,14 +263,13 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 						band->y0 =int_ceildivpow2(tilec->y0 - (1 << levelno) * y0b, levelno + 1);
 						band->x1 =int_ceildivpow2(tilec->x1 - (1 << levelno) * x0b, levelno + 1);
 						band->y1 =int_ceildivpow2(tilec->y1 - (1 << levelno) * y0b, levelno + 1);
-
 					}
 
 					ss = &tccp->stepsizes[resno ==0 ? 0 : 3 * (resno - 1) + bandno + 1];
 
 					gain =tccp->qmfbid ==0 ? dwt_getgain_real(band->bandno) : dwt_getgain(band->bandno);
 
-					numbps = img->comps[compno].prec + gain;//BPS=当前分量精准度+可逆小波子带标识
+					numbps = img->comps[compno].prec + gain;//BPS=当前分量精准度+压缩特性提高效果尺度
 					band->stepsize =(int) floor((1.0 + ss->mant / 2048.0) * pow(2.0, numbps - ss->expn) * 8192.0);
 					band->numbps = ss->expn + tccp->numgbits - 1;	/* WHY -1 ? */
 
