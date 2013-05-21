@@ -37,7 +37,6 @@
 #include "jpw.h"
 
 #define JPIP_JPIP 0x6a706970
-
 #define JP2_JP   0x6a502020
 #define JP2_FTYP 0x66747970
 #define JP2_JP2H 0x6a703268
@@ -75,12 +74,12 @@ int jp2_read_boxhdr(jp2_box_t * box)
 	return 0;
 }
 
+
 /*
 * 
 * Initialisation of a Standard JP2 structure
 * 创建一个标准的JP2结构
 */
-
 int jp2_init_stdjp2(jp2_struct_t * jp2_struct, j2k_image_t * img)
 {
 	int depth_0, sign, depth, i;
@@ -241,7 +240,6 @@ void jp2_write_bpcc(jp2_struct_t * jp2_struct)
 	cio_write(box.length, 4);	/*    L       */
 	cio_seek(box.init_pos + box.length);
 }
-
 
 int jp2_read_bpcc(jp2_struct_t * jp2_struct)
 {

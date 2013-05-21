@@ -425,7 +425,8 @@ void j2k_read_cod()
 
 	pos = cio_tell();
 	for (i = 0; i < j2k_img->numcomps; i++) {
-		tcp->tccps[i].csty = tcp->csty & J2K_CP_CSTY_PRT;
+	
+	tcp->tccps[i].csty = tcp->csty & J2K_CP_CSTY_PRT;
 		cio_seek(pos);
 		j2k_read_cox(i);
 	}
@@ -1464,6 +1465,7 @@ LIBJ2K_API int j2k_encode(j2k_image_t * img, j2k_cp_t * cp, char *output,int len
 	j2k_state = J2K_STATE_MHSIZ;//SIZ标记,图像和拼接块大小
 	j2k_write_siz();
 	j2k_state = J2K_STATE_MH;
+
 	set_epb=cio_tell();//Error protection block 位置 
 
 	// scrivo i marker jpwl direttamente solo se uso gli intermed files

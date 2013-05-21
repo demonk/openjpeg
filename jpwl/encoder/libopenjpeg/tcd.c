@@ -296,10 +296,11 @@ void tcd_malloc_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 						prc->x1 = int_min(cbgxend, band->x1);
 						prc->y1 = int_min(cbgyend, band->y1);
 
-						tlcblkxstart = int_floordivpow2(prc->x0, cblkwidthexpn) << cblkwidthexpn;
+						tlcblkxstart = int_floordivpow2(prc->x0, cblkwidthexpn) << cblkwidthexpn;//downward
 						tlcblkystart = int_floordivpow2(prc->y0, cblkheightexpn) << cblkheightexpn;
-						brcblkxend = int_ceildivpow2(prc->x1, cblkwidthexpn) << cblkwidthexpn;
+						brcblkxend = int_ceildivpow2(prc->x1, cblkwidthexpn) << cblkwidthexpn;//upward
 						brcblkyend = int_ceildivpow2(prc->y1, cblkheightexpn) << cblkheightexpn;
+
 						prc->cw = (brcblkxend - tlcblkxstart) >> cblkwidthexpn;
 						prc->ch = (brcblkyend - tlcblkystart) >> cblkheightexpn;
 
@@ -566,7 +567,6 @@ void tcd_free_encode(j2k_image_t * img, j2k_cp_t * cp, int curtileno)
 	}				/* for (tileno */
 	free(tcd_image.tiles);
 }
-
 
 void tcd_init(j2k_image_t * img, j2k_cp_t * cp)
 {
@@ -1168,6 +1168,7 @@ int tcd_encode_tile_pxm(int tileno, unsigned char *dest, int len,info_image * in
 		unsigned char elmt;
 		int i, j;
 		int tw, w;
+
 		tcd_tilecomp_t *tilec = &tile->comps[compno];//获取 tile 分量
 		int adjust = tcd_img->comps[compno].sgnd ? 0 : 1 << (tcd_img->comps[compno]. prec - 1);//???????
 		int offset_x, offset_y;//图像域在对应分量上的原点坐标偏移

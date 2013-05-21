@@ -66,8 +66,7 @@ typedef struct {
   UINT4 biClrImportant;		/* Number of important color (0: ALL) */
 } BITMAPINFOHEADER_t;
 
-int bmptoimage(char *filename, j2k_image_t * img, int subsampling_dx,
-	       int subsampling_dy, int Dim[2])
+int bmptoimage(char *filename, j2k_image_t * img, int subsampling_dx,int subsampling_dy, int Dim[2])
 {
   FILE *IN;
   FILE *Compo0 = NULL, *Compo1 = NULL, *Compo2 = NULL;

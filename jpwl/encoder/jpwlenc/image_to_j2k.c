@@ -168,41 +168,6 @@ void help_display()
 }
 
 /*由progression计算出的0~4的顺序值标识 */
-int give_progression(char progression[4])
-{
-	if (progression[0] == 'L' && progression[1] == 'R'
-		&& progression[2] == 'C' && progression[3] == 'P') {
-			//LRCP
-			return 0;
-	} else {
-		if (progression[0] == 'R' && progression[1] == 'L'
-			&& progression[2] == 'C' && progression[3] == 'P') {
-				//RLCP
-				return 1;
-		} else {
-			if (progression[0] == 'R' && progression[1] == 'P'
-				&& progression[2] == 'C' && progression[3] == 'L') {
-					//RPCL
-					return 2;
-			} else {
-				if (progression[0] == 'P' && progression[1] == 'C'
-					&& progression[2] == 'R' && progression[3] == 'L') {
-						//PCRL
-						return 3;
-				} else {
-					if (progression[0] == 'C' && progression[1] == 'P'
-						&& progression[2] == 'R' && progression[3] == 'L') {
-							//CPRL
-							return 4;
-					} else {
-						return -1;
-					}
-				}
-			}
-		}
-	}
-}
-
 double dwt_norms_97[4][10] = {
 	{1.000, 1.965, 4.177, 8.403, 16.90, 33.84, 67.69, 135.3, 270.6, 540.9},
 	{2.022, 3.989, 8.355, 17.04, 34.27, 68.63, 137.3, 274.6, 549.0},
@@ -589,7 +554,8 @@ int main(int argc, char **argv)
 			break;
 			/* ----------------------------------------------------- */
 		case 'P':			/* POC */
-			{	fprintf(stderr, "/----------------------------------\\\n");
+			{	fprintf(stderr, "/----------------------------------\\\n")
+				;
 			fprintf(stderr, "|  POC option not fully tested !!  |\n");
 			fprintf(stderr, "\\----------------------------------/\n");
 			//参数:-POC Ttile num = Resolution num start, Component num start, Layer num end, Resolution num end, Component num end, Progression order 
@@ -681,7 +647,8 @@ int main(int argc, char **argv)
 			}
 			break;
 			/* ------------------------------------------------------ */
-		case 'F':			/* use intermed files,是否合并文件 */
+
+		case 'F':			/* use intermed files,是否分割文件 */
 			{
 				cp.intermed_file=1;
 			}

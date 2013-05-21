@@ -73,7 +73,7 @@ typedef struct {
 
 typedef struct {
   int x0, y0, x1, y1;		/* dimension of the precinct : left upper corner (x0, y0) right low corner (x1,y1) */
-  int cw, ch;			/* number of precinct in width and heigth */
+  int cw, ch;			/* number of precinct in width and heigth:number of codeblock in width&height? */
   tcd_cblk_t *cblks;		/* code-blocks informations */
   tgt_tree_t *incltree;		/* inclusion tree */
   tgt_tree_t *imsbtree;		/* IMSB tree */
